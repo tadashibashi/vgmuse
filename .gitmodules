@@ -1,0 +1,3 @@
+[submodule "player/lib/gme"]
+	path = player/lib/gme
+	url = https://tadashibashi@bitbucket.org/tadashibashi/gme-vgmuse.git
