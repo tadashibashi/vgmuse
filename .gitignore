@@ -4,6 +4,8 @@ bin
 dist
 build
 
+cmake-build*
+
 .idea
 .vscode
 .vs
