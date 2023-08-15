@@ -1,0 +1,12 @@
+
+node_modules
+bin
+dist
+build
+
+.idea
+.vscode
+.vs
+
+.DS_Store
+thumbs.db
