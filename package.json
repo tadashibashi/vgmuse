@@ -1,0 +1,11 @@
+{
+  "name": "vgmuse",
+  "version": "1.0.0",
+  "description": "Chiptune music social platform",
+  "scripts": {
+    "start": "cd frontend && npm i && npm run build && cd ../server && npm i && npm run start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
