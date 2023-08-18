@@ -1,43 +1,50 @@
 import {APIError} from "../utility/errors.ts";
 
-type HttpMethodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type HttpMethodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 /**
- * Make a request and receive data
+ * Make a request and receive js object data.
+ * Throws APIError if any problem occurred.
  * @param url     - url to send to
- * @param method  - request method e.g. "GET", "PUT", "POST", "DELETE"
+ * @param method  - request method e.g. "GET", "PUT", "POST", "DELETE", default: "GET"
  * @param payload - object to send in the body
- * @param receive - type of object to receive
  */
-export async function request<T=unknown>(url: string, method: HttpMethodType, payload?: unknown, receive?: "json"): Promise<T>;
-export async function request(url: string, method: HttpMethodType, payload: unknown, receive?: "buffer"): Promise<ArrayBuffer>;
-export async function request(url: string, method: HttpMethodType="GET", payload?: unknown,
-                              receive: "json" | "buffer"="json"): Promise<unknown | ArrayBuffer> {
+export async function request(url: string, method: HttpMethodType="GET", payload?: unknown): Promise<unknown> {
+    const res = await _request(url, method, payload);
+    return res.json();
+}
 
+/**
+ * Private request base function
+ * @param url - url to send request to
+ * @param method - method to send
+ * @param payload - js object payload, if any
+ */
+async function _request(url: string, method: HttpMethodType, payload?: unknown) {
     const options: RequestInit = {
         method: method,
         body: payload ? JSON.stringify(payload) : null,
         headers: {"Content-Type": "application/json"},
     };
 
+    // make request
     const res = await fetch(url, options);
     if (!res.ok)
         throw new APIError(res.status, res.statusText);
-
-    return receive === "json" ? res.json() : res.arrayBuffer();
+    return res;
 }
 
 /**
  * Send form data to an endpoint
  * @param url    - url to send form to
  * @param method - http method to use
- * @param formEl - html form element containing input data
+ * @param formData - html form element containing input data
  *                 e.g. in onSubmit, pass the event target here
  */
-export async function sendForm(url: string, method: HttpMethodType, formEl: HTMLFormElement): Promise<unknown> {
+export async function sendForm(url: string, method: HttpMethodType, formData: FormData): Promise<unknown> {
     const options: RequestInit = {
         method: method,
-        body: new FormData(formEl),
+        body: formData,
     };
 
     const res = await fetch(url, options);
@@ -46,4 +53,16 @@ export async function sendForm(url: string, method: HttpMethodType, formEl: HTML
         throw new APIError(res.status, res.statusText);
 
     return res.json();
+}
+
+
+/**
+ * Load a file and return an arrayBuffer on success.
+ * Throws an APIError if any error occurred.
+ * Source address file must allow CORS policy from our base website url.
+ * @param url
+ */
+export async function fetchFile(url: string) {
+    const res = await _request(url, "GET", null);
+    return res.arrayBuffer();
 }
