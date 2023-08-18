@@ -5,14 +5,13 @@
 
 #include <cstdint>
 
-/**
- * TODO: refactor into AudioDevice
- */
 namespace vgmuse {
-    using audio_callback_t = void(*)(void *data, short *out, int count);
+
 
     class AudioDevice {
     public:
+        using callback_t = void(*)(void *data, short *out, int count);
+
         AudioDevice();
 
         /**
@@ -26,7 +25,7 @@ namespace vgmuse {
          * @param userdata - data to retrieve as void * in callback
          */
         AudioDevice(const char *name, bool isInput, int sampleRate,
-                    uint16_t bufferSize, audio_callback_t callback,
+                    uint16_t bufferSize, callback_t callback,
                     void *userdata);
         ~AudioDevice();
 
@@ -39,7 +38,7 @@ namespace vgmuse {
          * @param callback - callback to feed device, pass nullptr to use SDL_QueueAudio() instead.
          * @param userdata - data to retrieve as void * in callback
          */
-        const char *open(const char *name, bool isInput, int sampleRate, uint16_t bufferSize, audio_callback_t callback, void *userdata);
+        const char *open(const char *name, bool isInput, int sampleRate, uint16_t bufferSize, callback_t callback, void *userdata);
 
         /**
          * Check if audio device was successfully opened.
@@ -81,9 +80,15 @@ namespace vgmuse {
         [[nodiscard]]
         const char *name() const;
 
+        /**
+         * Sample rate of the audio device.
+         */
+        [[nodiscard]]
+        int sampleRate() const;
+
     private:
         friend void audioCallbackHandler(void *data, uint8_t *out, int count);
-        audio_callback_t callback();
+        callback_t callback();
         void *userdata();
 
         struct Impl;

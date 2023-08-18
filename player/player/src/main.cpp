@@ -1,22 +1,50 @@
-#include "AudioDevice.h"
+#include "Player.h"
 #include <iostream>
 #include <SDL.h>
 
 using namespace vgmuse;
 
-int main(int argc, char *argv[]) {
-    SDL_Init(SDL_INIT_AUDIO);
+Player player;
 
-    AudioDevice device;
-    auto result = device.open(nullptr, false, 48000, 256, nullptr, nullptr);
-    if (result) {
-        std::cout << result << '\n';
-        return 1;
+extern "C" {
+    void load_vgm(const char *path) {
+        player.load(path);
+        player.startTrack(0);
     }
+}
 
-    std::cout << device.name() << " was initialized\n";
-    std::cout << "shutting down\n";
-    device.close();
+extern "C" {
+void load_data(void *data, long size) {
+    player.loadData(data, size);
+    player.startTrack(0);
+}
+}
+
+int main(int argc, char *argv[]) {
+    if (SDL_Init(SDL_INIT_AUDIO) != 0)
+        return 1;
+
+    SDL_Delay(1000);
+    auto res = player.init();
+    if (res)
+        std::cerr << res << '\n';
+
+    res = player.load("https://bitbucket.org/tadashibashi/gme-vgmuse/src/master/test.nsf");
+    if (res)
+        std::cerr << res << '\n';
+
+    int track = 0;
+    player.startTrack(track);
+
+    bool isRunning = true;
+    while(isRunning) {
+        SDL_Event ev;
+        while(SDL_PollEvent(&ev)) {
+            if (ev.type == SDL_QUIT)
+                isRunning = false;
+        }
+        SDL_Delay(64);
+    }
 
     SDL_Quit();
     return 0;

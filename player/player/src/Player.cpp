@@ -1,23 +1,32 @@
 #include "Player.h"
 #include "AudioDevice.h"
-#include <gme/gme.h>
-#include <SDL.h>
+
+#include "Gme.hpp"
+#include "Error.h"
+#include <iostream>
 
 namespace vgmuse {
 
+
+
     struct Player::Impl {
-        Impl(): audio{} {}
+        Impl(): audio{}, emu{} {}
         ~Impl()
         {
+            if (emu)
+                gme_delete(emu);
             audio.close();
         }
 
         AudioDevice audio;
+        Music_Emu *emu;
     };
 
-    static void fillBuffer(void *data, short *out, int count)
+    void fillBuffer(void *data, short *out, int count)
     {
-        auto player = static_cast<Player *>(data);
+        auto m = static_cast<Player::Impl *>(data);
+        if (m->emu)
+            gme_play(m->emu, count, out);
     }
 
     Player::Player(): m(new Impl)
@@ -28,19 +37,52 @@ namespace vgmuse {
 
     Player::~Player() { delete m; }
 
-    const char *Player::open(int sampleRate, const char *device)
+    const char *Player::init(int sampleRate, const char *device)
     {
-         return m->audio.open(device, false, sampleRate, 512, fillBuffer, this);
+         return m->audio.open(device, false, sampleRate, 512, fillBuffer, this->m);
     }
-
 
 
     void Player::stop()
     {
-        SDL_PauseAudio(true);
+        m->audio.stop();
+    }
 
-        SDL_LockAudio();
-        SDL_UnlockAudio();
+    void Player::startTrack(int track)
+    {
+        if (m->emu)
+        {
+            gme_start_track(m->emu, track);
+            m->audio.start();
+        }
+
+    }
+
+    error_t Player::load(const char *file)
+    {
+        Music_Emu *emu = nullptr;
+        ERR_CHECK(gme_open_file(file, &emu, m->audio.sampleRate()));
+
+        m->emu = emu;
+
+        return SUCCESS;
+    }
+
+    error_t Player::loadData(const void *data, long size)
+    {
+        Music_Emu *emu = nullptr;
+        ERR_CHECK(gme_open_data(data, size, &emu, m->audio.sampleRate()));
+         
+
+        m->emu = emu;
+
+        return SUCCESS;
+    }
+
+    void Player::unload()
+    {
+        m->audio.stop();
+
     }
 
 }

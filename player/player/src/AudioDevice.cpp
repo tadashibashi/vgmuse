@@ -13,7 +13,7 @@ namespace vgmuse {
 
     struct AudioDevice::Impl {
         Impl(): callback(), userdata(), spec(), id(), isInput(), name() { }
-        audio_callback_t callback;
+        callback_t callback;
         void *userdata;
         SDL_AudioSpec spec;
         SDL_AudioDeviceID id;
@@ -27,8 +27,8 @@ namespace vgmuse {
     }
 
     AudioDevice::AudioDevice(const char *name, bool isInput, int sampleRate,
-                      uint16_t bufferSize, audio_callback_t callback,
-                      void *userdata) : m(new Impl)
+                             uint16_t bufferSize, callback_t callback,
+                             void *userdata) : m(new Impl)
     {
         open(name, isInput, sampleRate, bufferSize, callback, userdata);
     }
@@ -40,7 +40,7 @@ namespace vgmuse {
     }
 
     const char *AudioDevice::open(const char *name, bool isInput, int sampleRate,
-                                  uint16_t bufferSize, audio_callback_t callback,
+                                  uint16_t bufferSize, callback_t callback,
                                   void *userdata)
     {
         if (isOpen())
@@ -62,10 +62,10 @@ namespace vgmuse {
         // open the device
         SDL_AudioDeviceID id;
         if (!(id = SDL_OpenAudioDevice(name, isInput, &desired, &obtained,
-                                SDL_AUDIO_ALLOW_ANY_CHANGE))) {
+                                SDL_AUDIO_ALLOW_FREQUENCY_CHANGE))) {
             auto err = SDL_GetError();
             if (!err)
-                err = "Couldn't open SDL Audio";
+                err = "Couldn't init SDL Audio";
             return err;
         }
 
@@ -108,7 +108,7 @@ namespace vgmuse {
         SDL_UnlockAudioDevice(m->id);
     }
 
-    audio_callback_t AudioDevice::callback()
+    AudioDevice::callback_t AudioDevice::callback()
     {
         return m->callback;
     }
@@ -131,5 +131,10 @@ namespace vgmuse {
     const char *AudioDevice::name() const
     {
         return m->name;
+    }
+
+    int AudioDevice::sampleRate() const
+    {
+        return m->spec.freq;
     }
 }
