@@ -1,6 +1,6 @@
 import {APIError} from "../utility/errors.ts";
 
-export type HttpMethodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 /**
  * Make a request and receive js object data.
@@ -9,7 +9,7 @@ export type HttpMethodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
  * @param method  - request method e.g. "GET", "PUT", "POST", "DELETE", default: "GET"
  * @param payload - object to send in the body
  */
-export async function request(url: string, method: HttpMethodType="GET", payload?: unknown): Promise<unknown> {
+export async function request(url: string, method: HttpMethod="GET", payload?: unknown): Promise<unknown> {
     const res = await _request(url, method, payload);
     return res.json();
 }
@@ -20,7 +20,7 @@ export async function request(url: string, method: HttpMethodType="GET", payload
  * @param method - method to send
  * @param payload - js object payload, if any
  */
-async function _request(url: string, method: HttpMethodType, payload?: unknown) {
+async function _request(url: string, method: HttpMethod, payload?: unknown) {
     const options: RequestInit = {
         method: method,
         body: payload ? JSON.stringify(payload) : null,
@@ -41,7 +41,7 @@ async function _request(url: string, method: HttpMethodType, payload?: unknown) 
  * @param formData - html form element containing input data
  *                 e.g. in onSubmit, pass the event target here
  */
-export async function sendForm(url: string, method: HttpMethodType, formData: FormData): Promise<unknown> {
+export async function sendForm(url: string, method: HttpMethod, formData: FormData): Promise<unknown> {
     const options: RequestInit = {
         method: method,
         body: formData,
