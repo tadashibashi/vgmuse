@@ -58,7 +58,7 @@ export async function sendForm(url: string, method: HttpMethod, formData: FormDa
 
 /**
  * Load a file and return an arrayBuffer on success.
- * Throws an APIError if any error occurred.
+ * Throws a ServerError if any error occurred.
  * Source address file must allow CORS policy from our base website url.
  * @param url
  */

@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import './App.css';
+import {Routes} from "./components/Routes";
+import urls from "./urls";
 
 function App() {
-    const [count, setCount] = useState(0);
+    const [user, setUser] = useState(0);
 
     return (
         <div className="App">
-            <h1 className="text-3xl font-bold underline text-center text-blue-600">VGMuse</h1>
+            <Routes urls={urls}/>
         </div>
     );
 }
