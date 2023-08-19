@@ -1,4 +1,4 @@
-import {APIError} from "../utility/errors.ts";
+import {ServerError} from "../utility/errors.ts";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -30,7 +30,7 @@ async function _request(url: string, method: HttpMethod, payload?: unknown) {
     // make request
     const res = await fetch(url, options);
     if (!res.ok)
-        throw new APIError(res.status, res.statusText);
+        throw new ServerError(res.status, res.statusText);
     return res;
 }
 
@@ -50,7 +50,7 @@ export async function sendForm(url: string, method: HttpMethod, formData: FormDa
     const res = await fetch(url, options);
     if (!res.ok)
         // in express `statusText` is set via res.nativeResponse.statusMessage
-        throw new APIError(res.status, res.statusText);
+        throw new ServerError(res.status, res.statusText);
 
     return res.json();
 }

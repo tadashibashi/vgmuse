@@ -1,5 +1,5 @@
 
-export class APIError extends Error {
+export class ServerError extends Error {
 
     constructor(
         private readonly statusCode: number,
