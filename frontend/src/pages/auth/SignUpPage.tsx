@@ -2,16 +2,33 @@ import AuthHeader from "../../components/AuthHeader";
 import Form from "../../components/Form.tsx";
 import urls from "../../urls";
 
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import Alert from "../../components/Alert.tsx";
 import {useState} from "react";
+import {FormErrors, hasFormErrors} from "../../utility/formValidation.ts";
+
+
+
 
 export default function SignUpPage() {
-    const [showError, setShowError] = useState(true);
-    const [errors, setErrors] = useState<string[]>(["password length must be 10"]);
+    const [errors, setErrors] = useState<string[]>([]);
+    const navigate = useNavigate();
 
-    function onResponse(data: unknown) {
+    function onSuccess(data: unknown) {
         console.log("received:", data);
+        // TODO: set user here
+        navigate("/");
+    }
+
+    function onValidationError(errors: FormErrors) {
+        setErrors(Object.values(errors).map(value => value.message));
+    }
+
+    function shouldSubmit(formData: FormData): boolean {
+        const matching = formData.get("password") === formData.get("password-confirm");
+        if (!matching)
+            setErrors(["passwords are mismatched"]);
+        return matching;
     }
 
     return (
@@ -19,17 +36,35 @@ export default function SignUpPage() {
             <AuthHeader headerText="Create your new account"></AuthHeader>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                {showError && errors.length !== 0 &&
-                    <Alert type="error" title="Sign Up Error" className="mb-4" setIsVisible={setShowError}>
-                        <ul role="list" className="text-sm list-disc">
+                {errors.length !== 0 &&
+                    <Alert type="error"
+                           title={errors.length > 1 ? `There were ${errors.length} errors with your submission` : `There was an error with your submission`}
+                           className="mb-4"
+                           setIsVisible={(value) => setErrors([])}>
+                        <ul role="list" className="text-sm list-disc space-y-1 pl-5">
                             {errors.map((error, i) => <li key={"error-" + i}>{error}</li>)}
                         </ul>
                     </Alert>
                 }
 
-                <Form action="/api/auth/signup" onResponse={onResponse} className="space-y-6" method="POST">
+                <Form action="/api/auth/signup" onSuccess={onSuccess} shouldSubmit={shouldSubmit} onValidationError={onValidationError} className="space-y-6" method="POST">
                     <div>
-                        <div>
+                        <div className="border-gray-100 rounded">
+                            <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+                                Username
+                            </label>
+                            <div className="mt-2">
+                                <input
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    autoComplete="none"
+                                    required
+                                    className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-4 border-gray-100 rounded">
                             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                                 Email address
                             </label>
@@ -45,7 +80,7 @@ export default function SignUpPage() {
                             </div>
                         </div>
 
-                        <div className="mt-2 border-gray-100 rounded">
+                        <div className="mt-4 border-gray-100 rounded">
                             <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
                                 Password
                             </label>
@@ -61,11 +96,29 @@ export default function SignUpPage() {
                                 />
 
                             </div>
+
+                        </div>
+                        <div className="mt-4 border-gray-100 rounded">
+                            <label htmlFor="password-confirm" className="block text-sm font-medium leading-6 text-gray-900">
+                                Confirm Password
+                            </label>
+
+                            <div className="my-2">
+                                <input
+                                    id="password-confirm"
+                                    name="password-confirm"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    required
+                                    className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
+                                />
+
+                            </div>
                         </div>
 
                     </div>
 
-                    <div    >
+                    <div className="mt-24">
                         <button
                             type="submit"
                             className="flex w-full justify-center rounded-md bg-violet-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
