@@ -1,6 +1,5 @@
 import sendgrid from "@sendgrid/mail";
-import {reqEnv} from "./env";
-
+import {reqEnv} from "../utilities/env";
 
 sendgrid.setApiKey(reqEnv("SENDGRID_API_KEY"))
 
@@ -8,4 +7,3 @@ export async function sendMail(to: string, from: string, subject: string, html: 
     return sendgrid.send({
         to, from, subject, html});
 }
-
