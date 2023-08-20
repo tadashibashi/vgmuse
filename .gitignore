@@ -3,6 +3,10 @@ node_modules
 bin
 dist
 build
+server/src/*.js
+server/src/**/*.js
+server/src/*.js.map
+server/src/**/*.js.map
 
 cmake-build*
 
