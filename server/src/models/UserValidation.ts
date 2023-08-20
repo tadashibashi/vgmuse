@@ -1,5 +1,4 @@
 import mongoose, {Schema, Types, model} from "mongoose";
-import {ISchema, ITimeStamps} from "./types";
 
 // Icebox feature:
 // 0. User signs up
@@ -14,21 +13,13 @@ import {ISchema, ITimeStamps} from "./types";
 // Every once in a while, perhaps on server startup we can clean the database of expired
 // validations
 
-interface IUserValidation extends ISchema, ITimeStamps {
-    // members
 
-    code: string,
-    user: Types.ObjectId;
-    validated: boolean;
 
-    // virtual
 
-    isExpired: boolean;
-}
 
 const EXPIRATION_MINUTES = 15;
 
-const userValidationSchema = new Schema<IUserValidation>({
+const userValidationSchema = new Schema<VGMuse.IUserValidation>({
     code: {
         type: String,
         required: true,
