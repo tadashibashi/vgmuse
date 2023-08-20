@@ -17,6 +17,6 @@
     /* Linting */
     "strict": true,
   },
-  "include": ["src"],
+  "include": ["src", "../server/src/index.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
