@@ -1,7 +1,3 @@
-import dotenv from "dotenv";
-
-dotenv.config();
-
 /**
  * Get an environment variable, if it doesn't exist, return undefined.
  * @param key - environment variable name
