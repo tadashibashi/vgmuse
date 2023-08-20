@@ -21,7 +21,6 @@ const urls = {
         path: "/auth/signup",
         page: <SignUpPage />
     } as URLInfo,
-
 };
 
 export default urls;

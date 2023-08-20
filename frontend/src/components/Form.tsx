@@ -34,7 +34,7 @@ export default function Form({action, method, shouldSubmit, onResponse, catchErr
         // send form, make callbacks
         let res: unknown;
         try {
-            res = await sendForm(action, method || "POST", new FormData(e.currentTarget));
+            res = await sendForm(action, method || "POST", new FormData(e.nativeEvent.target as HTMLFormElement));
             if (onResponse)
                 onResponse(res);
         } catch(err) {
