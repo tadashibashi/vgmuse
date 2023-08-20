@@ -18,6 +18,7 @@ export const signup = async function(req, res, next) {
     try {
         const user = new User(req.body);
         await user.validate();
+        await user.save();
         await res.json(user);
 
     } catch(err) {

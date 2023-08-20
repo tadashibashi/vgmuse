@@ -6,7 +6,7 @@ import {Types} from "mongoose";
 declare global {
     namespace VGMuse {
         namespace Frontend {
-            type User = Omit<IUser, "password" | "userType">;
+            type User = Omit<IUser, "password" | "comparePasswords" | "isStaff" | "isAdmin">;
         }
 
         type Request = ExpressRequest;
@@ -34,6 +34,10 @@ declare global {
             password: string;
             isValidated: boolean;
             userType: UserType;
+
+            isStaff: boolean;
+            isAdmin: boolean;
+            checkPassword: (password: string) => Promise<boolean>;
         }
 
         interface IUserValidation extends ISchema, ITimeStamps {
