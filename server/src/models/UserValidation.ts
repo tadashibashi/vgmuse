@@ -20,17 +20,6 @@ import mongoose, {Schema, Types, model} from "mongoose";
 const EXPIRATION_MINUTES = 15;
 
 const userValidationSchema = new Schema<VGMuse.IUserValidation>({
-    code: {
-        type: String,
-        required: true,
-        validate: {
-            validator: function(v: string) {
-                const num = parseInt(v);
-                return !isNaN(num);
-            },
-            message: "code must be a string of integers"
-        }
-    },
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",

@@ -1,3 +1,6 @@
+import configEnv from "../config/env";
+configEnv();
+
 /**
  * Get an environment variable, if it doesn't exist, return undefined.
  * @param key - environment variable name

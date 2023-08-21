@@ -6,13 +6,14 @@ import {Types} from "mongoose";
 declare global {
     namespace VGMuse {
         namespace Frontend {
-            type User = Omit<IUser, "password" | "comparePasswords" | "isStaff" | "isAdmin">;
+            type User = Omit<IUser, "password" | "comparePasswords" | "isStaff" | "isAdmin" | "createdAt" | "updatedAt">;
         }
 
-        type Request = ExpressRequest;
+        type Request = ExpressRequest & {user?: Frontend.User};
         type UserType = "user" | "staff" | "admin";
 
-        export type MiddlewareFunction = (req: Request, res: Response, next: NextFunction) => void;
+        export type MiddlewareFunction = ((req: Request, res: Response, next: NextFunction) => void) |
+            ((req: Request, res: Response, next: NextFunction) => Promise<void>);
 
 
         export interface ISchema {
