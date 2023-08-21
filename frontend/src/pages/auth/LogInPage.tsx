@@ -3,15 +3,40 @@ import Form from "../../components/Form.tsx";
 import urls from "../../urls";
 
 import {Link} from "react-router-dom";
+import {FormErrors} from "../../utility/formValidation";
+import Alert from "../../components/Alert.tsx";
+import {useState} from "react";
 
 
 export default function LogInPage() {
+    const [errors, setErrors] = useState<string[]>([]);
+    function onValidationError(errors: FormErrors) {
+        setErrors(Object.values(errors).map(err => err.message));
+    }
+
+    function onSuccess(data: unknown) {
+        console.log(data);
+    }
+
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-            <AuthHeader headerText="Log in to your account" /> 
+            <AuthHeader headerText="Log in to your account" />
+
+
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm border-gray-100">
-                <Form action="/" className="space-y-6" method="POST">
+                {errors.length !== 0 &&
+                    <Alert type="error"
+                           title={errors.length > 1 ? `There were ${errors.length} errors with your submission` : `There was an error with your submission`}
+                           className="mb-4"
+                           setIsVisible={(value) => setErrors([])}>
+                        <ul role="list" className="text-sm list-disc space-y-1 pl-5">
+                            {errors.map((error, i) => <li key={"error-" + i}>{error}</li>)}
+                        </ul>
+                    </Alert>
+                }
+
+                <Form action="/api/auth/login" onValidationError={onValidationError} onSuccess={onSuccess} className="space-y-6" method="POST">
                     <div className="relative -space-y-px rounded-md shadow-sm">
                         <div className="pointer-events-none absolute inset-0 z-10 rounded-md ring-1 ring-inset ring-gray-300" />
                         <div>
