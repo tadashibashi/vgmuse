@@ -1,6 +1,7 @@
 import LogInPage from "./pages/auth/LogInPage";
 import SignUpPage from "./pages/auth/SignUpPage";
 import React from "react";
+import LandingPage from "./pages/LandingPage.tsx";
 
 export interface URLDirectory {
     [key: string]: URLInfo
@@ -20,6 +21,11 @@ const urls = {
     userSignUp: {
         path: "/auth/signup",
         page: <SignUpPage />
+    } as URLInfo,
+
+    landingPage: {
+        path: "/",
+        page: <LandingPage />
     } as URLInfo,
 };
 
