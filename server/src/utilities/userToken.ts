@@ -14,6 +14,7 @@ export function passUserToken(user: VGMuse.IUser, rememberMe: boolean, req: Requ
     const token = createToken( {user}, rememberMe ? "30d" : "24h");
 
     res.cookie("user", token, {
+        httpOnly: true,
         maxAge: rememberMe ? ONE_MONTH : null,
         sameSite: "strict",
         secure: PRODUCTION,
