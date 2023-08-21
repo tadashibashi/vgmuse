@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import {hash, hashCompare} from "../utilities/hash";
 const Schema = mongoose.Schema;
 
-const emailValidator = /^\w+@\w+.\w+$/;
+const emailValidator = /^[\w-.]+@([\w-]+\.)+[\w-]{2,6}$/;
 
 const userSchema = new Schema<VGMuse.IUser>({
     username: {
@@ -43,15 +43,9 @@ const userSchema = new Schema<VGMuse.IUser>({
 
     password: {
         type: String,
-        required: true,
+        required: [true, "The password field is missing"],
+        minLength: [8, "Your password must be at least 8 characters"],
         validate: [
-            // password is at least 8 chars
-            {
-                validator(v: string) {
-                    return v.length >= 8;
-                },
-                message: "Your password must be at least 8 characters",
-            },
             // password has at least one symbol, one letter, and one number
             {
                 validator(v: string) {
@@ -67,7 +61,7 @@ const userSchema = new Schema<VGMuse.IUser>({
     isValidated: {
         type: Boolean,
         required: true,
-        default: false
+        default: null,
     },
 
     userType: {
@@ -82,11 +76,16 @@ const userSchema = new Schema<VGMuse.IUser>({
         // Remove sensitive & unnecessary data when sending to client-side
         transform: function(doc, ret) {
             delete ret.password;
+            delete ret.createdAt;
+            delete ret.updatedAt;
+            delete ret._v;
             return ret;
         },
         virtuals: false,
     },
 });
+
+// ===== Middleware ===========================================================
 
 userSchema.pre("save", async function(next) {
     if (!this.isModified("password"))
@@ -94,17 +93,25 @@ userSchema.pre("save", async function(next) {
     this.password = await hash(this.password);
 });
 
+
+// ===== Getters / Setters ====================================================
+
 userSchema.virtual("isStaff").get(function() {
     // make sure it's a validated staff member
-    return this.isValidated && (this.userType === "staff" || this.userType === "admin");
+    return this.isValidated &&
+        (this.userType === "staff" || this.userType === "admin");
 });
 
 userSchema.virtual("isAdmin").get(function() {
     return this.isValidated && (this.userType === "admin");
 });
 
+
+// ===== Methods ==============================================================
+
 userSchema.method("checkPassword", async function(password: string) {
     return hashCompare(password, this.password);
 });
+
 
 export default mongoose.model("User", userSchema);
