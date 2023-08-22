@@ -64,20 +64,21 @@ export function passUserToken(user: VGMuse.Frontend.User, rememberMe: boolean, r
 
 const AUTH_TYPE = "Bearer ";
 
-// reads user cookie from the frontend
+
+// reads user cookie from authorization header
 export async function readUserToken(req: Request, res: Response): Promise<(JwtPayload & {user?: VGMuse.Frontend.User}) | null> {
 
     // get auth token
-    let token = req.headers.authorization;
+    let token = req.headers.authorization || null;
 
 
     // verify that token is Bearer auth type
     if (token && !token.startsWith(AUTH_TYPE)) {
-        cleanUp();
-        return null;
-    } else if (token.startsWith(AUTH_TYPE)) {
-        // remove "Bearer "
-        token = token.slice(AUTH_TYPE.length);
+        if (token.startsWith(AUTH_TYPE))
+            // remove "Bearer "
+            token = token.slice(AUTH_TYPE.length);
+        else
+            return cleanUp();
     }
 
     const refresh = req.cookies["user-refresh"];
@@ -85,12 +86,10 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
         if (refresh) {
             token = await refreshToken(refresh);
             if (!token) {
-                cleanUp();
-                return null;
+                return cleanUp();
             }
         } else {
-            cleanUp();
-            return null;
+            return cleanUp();
         }
     }
 
@@ -99,14 +98,12 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
     // check that token valid and parse it
     const payload = verifyToken(token, true);
     if (payload.error) {
-        cleanUp();
-        return null;
+        return cleanUp();
     }
 
     // check that payload has user
     if (!isJwtPayload(payload) || !isUserPayload(payload)) {
-        cleanUp();
-        return null;
+        return cleanUp();
     }
 
     // check if expired payload
@@ -116,32 +113,27 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
         if (refresh) {
             token = await refreshToken(refresh, payload.user);
             if (!token) {
-                cleanUp();
-                return null;
+                return cleanUp();
             }
         } else {
-            cleanUp();
-            return null;
+            return cleanUp();
         }
     }
 
     // check that fingerprints match
     let fingerprint = req.cookies["fingerprint"];
     if (!fingerprint) {
-        res.clearCookie("user");
-        return null;
+        return cleanUp();
     }
 
     try {
-        if (!bcrypt.compareSync(fingerprint, payload.user.fingerprint)) {
+        if (!bcrypt.compareSync(fingerprint, payload.user.fingerprint || "")) {
             console.error("fingerprint does not match!");
             // delete invalid token
-            cleanUp();
-            return null;
+            return cleanUp();
         }
     } catch(err) {
-        cleanUp();
-        return null;
+        return cleanUp();
     }
 
 
@@ -169,7 +161,7 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
 
         // no user, get it from the db
         if (!user) {
-            user = await User.findById(refreshToken.user);
+            user = await User.findById(refreshToken.user) || undefined;
 
             if (!user) {
                 return null;
@@ -183,5 +175,6 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
     function cleanUp() {
         res.clearCookie("user");
         res.clearCookie("user-refresh");
+        return null;
     }
 }
