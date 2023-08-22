@@ -6,10 +6,10 @@ import {Types} from "mongoose";
 declare global {
     namespace VGMuse {
         namespace Frontend {
-            type User = Omit<IUser, "password" | "comparePasswords" | "isStaff" | "isAdmin" | "createdAt" | "updatedAt">;
+            type User = Omit<IUser, "password" | "comparePasswords" | "isStaff" | "isAdmin" | "createdAt" | "updatedAt"> & {fingerprint?: string};
         }
 
-        type Request = ExpressRequest & {user?: Frontend.User};
+        type Request = ExpressRequest & {user?: Frontend.User & {isStaff?: boolean, isAdmin?: boolean}};
         type UserType = "user" | "staff" | "admin";
 
         export type MiddlewareFunction = ((req: Request, res: Response, next: NextFunction) => void) |
@@ -29,7 +29,7 @@ declare global {
             updatedAt: Date;
         }
 
-        interface IUser extends VGMuse.ITimeStamps {
+        interface IUser extends ISchema, VGMuse.ITimeStamps {
             username: string,
             email: string;
             password: string;
