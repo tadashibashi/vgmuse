@@ -11,7 +11,8 @@ const userSchema = new Schema<VGMuse.IUser>({
         unique: true,
         validate: {
             validator: async function(v: string) {
-                const models = await this.constructor.find({username: v});
+                const ctor = this.constructor as mongoose.Model<any>;
+                const models = await ctor.find({username: v});
                 return models.length === 0;
             },
             message: "This username has already been taken",
@@ -33,7 +34,9 @@ const userSchema = new Schema<VGMuse.IUser>({
             // is unique email address?
             {
                 async validator(v: string) {
-                    const models = await this.constructor.find({email: v});
+                    const ctor = this.constructor as mongoose.Model<any>;
+
+                    const models = await ctor.find({email: v});
                     return models.length === 0;
                 },
                 message: "An account with your email address already exists"
@@ -61,7 +64,7 @@ const userSchema = new Schema<VGMuse.IUser>({
     isValidated: {
         type: Boolean,
         required: true,
-        default: null,
+        default: false,
     },
 
     userType: {
