@@ -9,9 +9,11 @@ interface IUser {
 function App() {
     const [user, setUser] = useState(0);
 
+
+
     return (
         <div className="App">
-            <Routes urls={urls}/>
+            <Routes urls={urls.root}/>
         </div>
     );
 }

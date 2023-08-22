@@ -9,15 +9,20 @@ import {FormErrors, hasFormErrors} from "../../utility/formValidation.ts";
 
 import {ArrowPathIcon} from "@heroicons/react/24/solid";
 import Spinner from "../../components/icons/Spinner.tsx";
+import {EnvelopeIcon, LockClosedIcon, UserCircleIcon} from "@heroicons/react/24/outline";
+import {Transition} from "@headlessui/react";
+import debounce from "../../utility/debounce.ts";
 
 
 export default function SignUpPage() {
     const [errors, setErrors] = useState<string[]>([]);
-
+    const [showErrors, setShowErrors] = useState<boolean>(false);
     const [sending, setSending] = useState<boolean>(false);
 
     // flag to prevent multiple submits
     const canSubmitRef = useRef<boolean>(true);
+
+    const submitCallbackRef = useRef(debounce(() => true, 500));
 
     const navigate = useNavigate();
 
@@ -25,135 +30,167 @@ export default function SignUpPage() {
     function onSuccess(data: unknown) {
         console.log("received:", data);
         setSending(false);
+        setShowErrors(false);
         // TODO: set user here
-        navigate(urls.validationEmailSent.path);
+        navigate(urls.auth.validationEmailSent.path);
     }
 
     function onValidationError(errors: FormErrors) {
         setErrors(Object.values(errors).map(value => value.message));
         canSubmitRef.current = true;
+        setShowErrors(true);
         setSending(false);
     }
 
     function shouldSubmit(formData: FormData): boolean {
+        if (!submitCallbackRef.current()) {
+            console.log("deBounce!");
+            return false;
+        }
+
         if (!canSubmitRef.current) return false;
         canSubmitRef.current = false;
 
         const matching = formData.get("password") === formData.get("password-confirm");
-        if (!matching)
-            setErrors(["passwords are mismatched"]);
-        else {
-            setSending(true);
-
+        if (!matching) {
+            setErrors(["Passwords are mismatched"]);
+            setShowErrors(true);
+            return false;
         }
 
-        return matching;
+        if (formData.get("password") === formData.get("username")) {
+            setErrors(["Password must not be the same as username"]);
+            setShowErrors(true);
+            return false;
+        }
+
+        setSending(true);
+        return true;
     }
 
     return (
-        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-            <AuthHeader headerText="Create your new account"></AuthHeader>
+        <>
+            <h2 className="my-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 pointer-events-none">
+                Register your new account
+            </h2>
+            <Transition show={showErrors}
+                        enter="transition-all ease-in-out duration-150"
+                        enterFrom="opacity-0 scale-0 max-h-0"
+                        enterTo="opacity-100 scale-100 max-h-full"
+                        leave="transition-all ease-in-out duration-300"
+                        leaveFrom="opacity-100 max-h-full scale-100"
+                        leaveTo="opacity-0 max-h-0 scale-0"
+            >
+                <Alert type="error"
+                       title={errors.length > 1 ? `There were ${errors.length} errors with your submission` : `There was an error with your submission`}
+                       className="mb-4"
+                       setIsVisible={(value) => setShowErrors(value)}>
+                    <ul role="list" className="text-sm list-disc space-y-1 pl-5">
+                        {errors.map((error, i) => <li key={"error-" + i}>{error}</li>)}
+                    </ul>
+                </Alert>
+            </Transition>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                {errors.length !== 0 &&
-                    <Alert type="error"
-                           title={errors.length > 1 ? `There were ${errors.length} errors with your submission` : `There was an error with your submission`}
-                           className="mb-4"
-                           setIsVisible={(value) => setErrors([])}>
-                        <ul role="list" className="text-sm list-disc space-y-1 pl-5">
-                            {errors.map((error, i) => <li key={"error-" + i}>{error}</li>)}
-                        </ul>
-                    </Alert>
-                }
-
-                <Form action="/api/auth/signup" onSuccess={onSuccess} shouldSubmit={shouldSubmit} onValidationError={onValidationError} className="space-y-6" method="POST">
-                    <div>
-                        <div className="border-gray-100 rounded">
-                            <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
-                                Username
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    id="username"
-                                    name="username"
-                                    type="text"
-                                    autoComplete="off"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
-                                />
+            <Form action="/api/auth/signup" onSuccess={onSuccess} shouldSubmit={shouldSubmit} onValidationError={onValidationError} className="space-y-6" method="POST">
+                <div className="mb-12">
+                    <div className="border-gray-100 rounded">
+                        <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+                            Username
+                        </label>
+                        <div className="mt-2 relative">
+                            <div className="pointer-events-none absolute z-50 -inset-y-px left-0 flex items-center px-1 ring-gray-300 rounded-l">
+                                <UserCircleIcon className=" h-8 p-1.5 text-gray-100" aria-hidden="true" />
                             </div>
+                            <input
+                                id="username"
+                                name="username"
+                                type="text"
+                                autoComplete="off"
+                                required
+                                className="block w-full rounded-md border-0 py-1.5 px-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
+                            />
                         </div>
-                        <div className="mt-4 border-gray-100 rounded">
-                            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                                Email address
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
-                                />
+                    </div>
+                    <div className="mt-4 border-gray-100 rounded">
+                        <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                            Email address
+                        </label>
+
+                        <div className="mt-2 relative">
+                            <div className="pointer-events-none absolute z-50 inset-y-0 -left-2 flex items-center pl-3">
+                                <EnvelopeIcon className=" h-8 p-1.5 text-gray-100" aria-hidden="true" />
                             </div>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                autoComplete="email"
+                                required
+                                className="block w-full rounded-md border-0 py-1.5 px-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
+                            />
                         </div>
+                    </div>
 
-                        <div className="mt-4 border-gray-100 rounded">
-                            <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                                Password
-                            </label>
+                    <div className="mt-4 border-gray-100 rounded">
+                        <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                            Password
+                        </label>
 
-                            <div className="my-2">
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
-                                />
-
+                        <div className="my-2 relative">
+                            <div className="pointer-events-none absolute z-50 -inset-y-px left-0 flex items-center px-1 ring-gray-300 rounded-l">
+                                <LockClosedIcon className=" h-8 p-1.5 text-gray-100" aria-hidden="true" />
                             </div>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                autoComplete="current-password"
+                                required
+                                className="block w-full rounded-md border-0 py-1.5 px-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
+                            />
 
-                        </div>
-                        <div className="mt-4 border-gray-100 rounded">
-                            <label htmlFor="password-confirm" className="block text-sm font-medium leading-6 text-gray-900">
-                                Confirm Password
-                            </label>
-
-                            <div className="my-2">
-                                <input
-                                    id="password-confirm"
-                                    name="password-confirm"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
-                                />
-
-                            </div>
                         </div>
 
                     </div>
+                    <div className="mt-4 border-gray-100 rounded">
+                        <label htmlFor="password-confirm" className="block text-sm font-medium leading-6 text-gray-900">
+                            Confirm Password
+                        </label>
 
-                    <div className="mt-24">
-                        <button
-                            type="submit"
-                            className="flex w-full justify-center rounded-md bg-violet-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
-                        >
-                            {sending && <Spinner className="me-2" bgClass="fill-violet-900" fgClass="fill-violet-200"/>} {sending ? "Processing..." : "Sign up"}
-                        </button>
+                        <div className="my-2 relative">
+                            <div className="pointer-events-none absolute z-50 -inset-y-px left-0 flex items-center px-1 ring-gray-300 rounded-l">
+                                <LockClosedIcon className=" h-8 p-1.5 text-gray-100" aria-hidden="true" />
+                            </div>
+                            <input
+                                id="password-confirm"
+                                name="password-confirm"
+                                type="password"
+                                autoComplete="current-password"
+                                required
+                                className="block w-full rounded-md border-0 py-1.5 px-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6"
+                            />
+
+                        </div>
                     </div>
-                </Form>
 
-                <p className="mt-10 text-center text-sm text-gray-500">
-                    <span className="pointer-events-none">Already a member?{' '}</span>
-                    <Link to={urls.userLogin.path} className="font-semibold leading-6 text-violet-600 hover:text-violet-500">
-                        Log in here
-                    </Link>
-                </p>
-            </div>
-        </div>
+                </div>
+
+                <div className="mt-24">
+                    <button
+                        type="submit"
+                        className="flex w-full justify-center rounded-md bg-violet-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
+                    >
+                        {sending && <Spinner className="me-2" bgClass="fill-violet-900" fgClass="fill-violet-200"/>} {sending ? "Processing..." : "Sign up"}
+                    </button>
+                </div>
+            </Form>
+
+            <p className="mt-10 text-center text-sm text-gray-500">
+                <span className="pointer-events-none">Already a member?{' '}</span>
+                <Link to={urls.auth.userLogin.path} className="font-semibold leading-6 text-violet-600 hover:text-violet-500">
+                    Log in here
+                </Link>
+            </p>
+        </>
     );
 }

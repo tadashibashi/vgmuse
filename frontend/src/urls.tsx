@@ -3,6 +3,7 @@ import SignUpPage from "./pages/auth/SignUpPage";
 import React from "react";
 import LandingPage from "./pages/LandingPage.tsx";
 import ValidationEmailSentPage from "./pages/auth/ValidationEmailSentPage.tsx";
+import AuthPages from "./pages/auth/AuthPages.tsx";
 
 export interface URLDirectory {
     [key: string]: URLInfo
@@ -13,26 +14,33 @@ export interface URLInfo {
     page: React.JSX.Element;
 }
 
-const urls = {
-    userLogin: {
-        path: "/auth/login",
-        page: <LogInPage />
-    } as URLInfo,
+export const urls = {
+    root: {
+        landingPage: {
+            path: "/",
+            page: <LandingPage />
+        } as URLInfo,
+        auth: {
+            path: "/auth/*",
+            page: <AuthPages />
+        } as URLInfo
+    },
 
-    userSignUp: {
-        path: "/auth/signup",
-        page: <SignUpPage />
-    } as URLInfo,
+    auth: {
+        userLogin: {
+            path: "/auth/login",
+            page: <LogInPage />
+        } as URLInfo,
+        userSignUp: {
+            path: "/auth/signup",
+            page: <SignUpPage />
+        } as URLInfo,
+        validationEmailSent: {
+            path: "/auth/email-sent",
+            page: <ValidationEmailSentPage />
+        } as URLInfo,
+    },
 
-    validationEmailSent: {
-        path: "/auth/email-sent",
-        page: <ValidationEmailSentPage />
-    } as URLInfo,
-
-    landingPage: {
-        path: "/",
-        page: <LandingPage />
-    } as URLInfo,
 };
 
 export default urls;

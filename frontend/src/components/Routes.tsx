@@ -1,5 +1,5 @@
 import {Routes as ReactRoutes, Route} from "react-router-dom";
-import {URLDirectory, URLInfo} from "../urls.tsx";
+import {URLDirectory} from "../urls";
 
 export function Routes({urls}: {urls: URLDirectory}) {
 
