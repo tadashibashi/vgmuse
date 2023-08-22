@@ -10,7 +10,7 @@ const JWT_SECRET = reqEnv("JWT_SECRET");
  * @param expiresIn - vercel ms notation for time, default: 24h -
  *                    for more info: https://github.com/vercel/ms
  */
-export function createToken(payload: object|Buffer, expiresIn: number|string="24h"): string {
+export function createToken<T extends (object|Buffer) & {error?: unknown}>(payload: T, expiresIn: number|string="24h"): string {
     if (payload["error"])
         throw Error("createToken: fieldName 'error' is reserved for server-side error handling, please remove from payload");
     return jwt.sign(
@@ -72,5 +72,5 @@ export function verifyToken(token: string, allowExpired: boolean = false) {
  * @param payload - payload to check
  */
 export function isPayloadExpired(payload: JwtPayload) {
-    return payload.exp <= Date.now()/1000.0;
+    return payload.exp && payload.exp <= Date.now()/1000.0;
 }
