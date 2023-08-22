@@ -5,6 +5,8 @@ import {reqEnv} from "../../lib/env";
 import {createToken} from "../../lib/jwt";
 import {passUserToken, readUserToken} from "../../lib/userToken";
 
+
+
 export const refreshUser = async function(req, res, next) {
 
     try {
@@ -15,6 +17,8 @@ export const refreshUser = async function(req, res, next) {
     }
 
 } as VGMuse.MiddlewareFunction;
+
+
 
 export const login = async function(req, res, next) {
     const email = req.body["email"];
@@ -57,6 +61,7 @@ export const login = async function(req, res, next) {
 export const logout = function(req, res, next) {
     try {
         res.clearCookie("user");
+        res.clearCookie("user-refresh")
         return res.json({success: "true"});
     } catch (e) {
         return next(e);
