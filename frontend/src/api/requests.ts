@@ -1,4 +1,5 @@
 import {ServerError} from "../utility/errors.ts";
+import {getUserToken} from "./auth.ts";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -14,6 +15,22 @@ export async function request(url: string, method: HttpMethod="GET", payload?: u
     return res.json();
 }
 
+
+/**
+ * Inject user token authorization into header if there is a token stored locally
+ * @param options
+ */
+function injectUserHeader(options: RequestInit & {headers?: {Authorization?: string}}) {
+    const userToken = getUserToken();
+    if (!userToken) return;
+
+    if (!options.headers)
+        options.headers = {};
+
+    options.headers.Authorization = "Bearer " + getUserToken();
+}
+
+
 /**
  * Private request base function
  * @param url - url to send request to
@@ -27,12 +44,15 @@ async function _request(url: string, method: HttpMethod, payload?: unknown) {
         headers: {"Content-Type": "application/json"},
     };
 
+    injectUserHeader(options);
+
     // make request
     const res = await fetch(url, options);
     if (!res.ok)
         throw new ServerError(res.status, res.statusText);
     return res;
 }
+
 
 /**
  * Send form data to an endpoint
@@ -46,6 +66,8 @@ export async function sendForm(url: string, method: HttpMethod, formData: FormDa
         method: method,
         body: formData,
     };
+
+    injectUserHeader(options);
 
     const res = await fetch(url, options);
     if (!res.ok)
