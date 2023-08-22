@@ -5,9 +5,14 @@ import {readUserToken} from "../lib/userToken";
  * And injects it into req.user. Null value if user is not logged in.
  */
 export default function injectUser() {
-    return function (req, res, next) {
+    return async function (req, res, next) {
         try {
-            req.user = readUserToken(req)?.user;
+            req.user = (await readUserToken(req, res))?.user;
+            if (req.user) {
+                req.user.isAdmin = req.user.userType === "admin";
+                req.user.isStaff = req.user.userType === "staff" || req.user.userType === "admin";
+            }
+
             next();
         } catch (err) {
             next(err);
