@@ -2,7 +2,7 @@ import express, {Express, Request, Response, NextFunction} from "express";
 import morgan from "morgan";
 import router from "../routes/master";
 import cookieParser from "cookie-parser";
-import {ServerError} from "../utilities/errors";
+import {ServerError} from "../lib/errors";
 import injectUser from "../middleware/injectUser";
 
 function config(server: Express) {

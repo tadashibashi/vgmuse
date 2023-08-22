@@ -1,4 +1,4 @@
-import {readUserToken} from "../utilities/userToken";
+import {readUserToken} from "../lib/userToken";
 
 /**
  * This middleware function gets the user from the browser cookie

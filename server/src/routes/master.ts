@@ -3,7 +3,7 @@
  */
 
 import express from "express";
-import {ServerError} from "../utilities/errors";
+import {ServerError} from "../lib/errors";
 import path from "path";
 const router = express.Router();
 

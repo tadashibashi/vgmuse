@@ -1,9 +1,9 @@
 import User from "../../models/User";
 import {Error} from "mongoose";
 import {sendEmail} from "../../api/email";
-import {reqEnv} from "../../utilities/env";
-import {createToken} from "../../utilities/jwt";
-import {passUserToken, readUserToken} from "../../utilities/userToken";
+import {reqEnv} from "../../lib/env";
+import {createToken} from "../../lib/jwt";
+import {passUserToken, readUserToken} from "../../lib/userToken";
 
 export const getUser = async function(req, res, next) {
 

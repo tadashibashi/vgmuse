@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {reqEnv} from "../utilities/env";
+import {reqEnv} from "../lib/env";
 
 function config() {
     mongoose.connect(reqEnv("DATABASE_URI")).then(() => {

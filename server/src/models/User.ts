@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {hash, hashCompare} from "../utilities/hash";
+import {hash, hashCompare} from "../lib/hash";
 const Schema = mongoose.Schema;
 
 const emailValidator = /^[\w-.]+@([\w-]+\.)+[\w-]{2,6}$/;

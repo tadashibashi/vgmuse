@@ -5,15 +5,14 @@ import {ALGORITHM} from "./constants";
 const JWT_SECRET = reqEnv("JWT_SECRET");
 
 /**
- * Creates a JSON webtoken
+ * Create a new JSON webtoken
  * @param payload - the data to store, gets JSON-stringified
  * @param expiresIn - vercel ms notation for time, default: 24h -
  *                    for more info: https://github.com/vercel/ms
  */
-export function createToken(payload: object|Buffer, expiresIn: string="24h"): string {
+export function createToken(payload: object|Buffer, expiresIn: number|string="24h"): string {
     if (payload["error"])
         throw Error("createToken: fieldName 'error' is reserved for server-side error handling, please remove from payload");
-
     return jwt.sign(
         payload,
         JWT_SECRET,
@@ -22,7 +21,7 @@ export function createToken(payload: object|Buffer, expiresIn: string="24h"): st
 }
 
 /**
- * Checks for token verification and decodes it
+ * Check for token verification and decode it
  * @param token - JWT token string
  * @param allowExpired - allows expired tokens to pass verification - default: false
  *                       if set to true, pass payload in isTokenExpired to check this
@@ -69,9 +68,9 @@ export function verifyToken(token: string, allowExpired: boolean = false) {
 
 
 /**
- * Checks whether a payload is expired
+ * Check whether a payload is expired
  * @param payload - payload to check
  */
-export function isTokenExpired(payload: JwtPayload) {
-    return payload.exp < Date.now();
+export function isPayloadExpired(payload: JwtPayload) {
+    return payload.exp <= Date.now()/1000.0;
 }

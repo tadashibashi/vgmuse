@@ -25,6 +25,6 @@ function isAlgorithm(str: string): str is jwt.Algorithm {
 
 
 export const PRODUCTION = getEnv("PRODUCTION") === "true";
-export const DOMAIN = reqEnv("DOMAIN");
+export const DOMAIN = reqEnv("DOMAIN") || "http://localhost";
 
 export const ALGORITHM = getAlgorithm();
