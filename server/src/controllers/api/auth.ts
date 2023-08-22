@@ -5,10 +5,10 @@ import {reqEnv} from "../../lib/env";
 import {createToken} from "../../lib/jwt";
 import {passUserToken, readUserToken} from "../../lib/userToken";
 
-export const getUser = async function(req, res, next) {
+export const refreshUser = async function(req, res, next) {
 
     try {
-        const user = readUserToken(req);
+        const user = await readUserToken(req, res);
         return res.json(user);
     } catch (e) {
         next(e);
@@ -25,9 +25,9 @@ export const login = async function(req, res, next) {
     if (!user) {
         return res.json({
             errors: {
-                "username": {
+                "email": {
                     "name": "DatabaseReferenceError",
-                    "message": "A user with that username was not found",
+                    "message": "An an account with that email address was not found",
                 }
             }
         });
@@ -78,16 +78,16 @@ export const signup = async function(req, res, next) {
         // send email
         sendEmail(user.email, reqEnv("EMAIL_SENDER"), "Activate your VGMuse Account",
 
-`<p>Dear ${user.username},</p>
-<p>Thank you for registering your account at VGMuse.com! 
+`<p>Hello,</p>
+<p>Thank you for registering your account at VGMuse! 
 Please click the link below to activate your account.<p>
 
-<a href="https://localhost:3000/api/auth/activate/${token}">https://localhost:3000/api/auth/activate/${token}</a>
+<a href="http://localhost:3000/api/auth/activate/${token}">http://localhost:3000/api/auth/activate/${token}</a>
 
 <p>We hope you enjoy your new chiptune music space!</p>
 
 <p>Best regards,</p>
-<p>Aaron from VGMuse</p>
+<p>The VGMuse Team</p>
 `).catch(err => { console.error(err); });
 
         // pass token to frontend
