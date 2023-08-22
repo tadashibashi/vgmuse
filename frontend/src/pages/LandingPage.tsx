@@ -3,7 +3,7 @@ import {Dialog, Transition} from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import {Link} from "react-router-dom";
 import urls from "../urls.tsx";
-import FadeInOut from "../components/FadeInOut.tsx";
+import FadeIn from "../components/FadeIn.tsx";
 
 const navigation = [
     { name: 'Product', href: '#' },
@@ -22,7 +22,7 @@ export default function LandingPage() {
     }, []);
 
     return (
-        <FadeInOut>
+        <FadeIn>
             <div className="bg-white">
                 <header className="absolute inset-x-0 top-0 z-50">
                     <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
@@ -165,7 +165,7 @@ export default function LandingPage() {
                     </div>
                 </div>
             </div>
-        </FadeInOut>
+        </FadeIn>
 
     );
 }

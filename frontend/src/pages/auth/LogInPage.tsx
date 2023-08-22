@@ -1,16 +1,15 @@
 import AuthHeader from "../../components/AuthHeader";
-import Form from "../../components/Form.tsx";
+import Form from "../../components/Form";
 import urls from "../../urls";
 
 import {Link, useNavigate} from "react-router-dom";
 import {FormErrors} from "../../utility/formValidation";
 import Alert from "../../components/Alert";
-import React, {useEffect, useState} from "react";
-import {getBackendUser} from "../../api/auth";
+import {useEffect, useState} from "react";
 import Spinner from "../../components/icons/Spinner";
 
 import {Transition} from "@headlessui/react";
-import FadeIn from "../../components/FadeInOut";
+import FadeIn from "../../components/FadeIn";
 import {EnvelopeIcon, LockClosedIcon} from "@heroicons/react/24/outline";
 
 export default function LogInPage() {
