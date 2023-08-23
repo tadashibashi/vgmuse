@@ -5,7 +5,7 @@ import urls from "../../urls";
 import {Link, useNavigate} from "react-router-dom";
 import Alert from "../../components/Alert.tsx";
 import React, {useRef, useState} from "react";
-import {FormErrors} from "../../lib/formValidation.ts";
+import {FormErrors} from "../../lib/formValidation";
 
 import Spinner from "../../components/icons/Spinner.tsx";
 import {EnvelopeIcon, LockClosedIcon, UserCircleIcon} from "@heroicons/react/24/outline";

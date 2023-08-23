@@ -1,5 +1,5 @@
 import {IError} from "./types.ts";
-type FormErrors = Record<string, IError>;
+export type FormErrors = Record<string, IError>;
 
 
 /**
