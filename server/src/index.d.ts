@@ -29,7 +29,7 @@ declare global {
             updatedAt: Date;
         }
 
-        interface IUser extends ISchema, VGMuse.ITimeStamps {
+        interface IUser extends ISchema, ITimeStamps {
             username: string,
             email: string;
             password: string;
