@@ -1,6 +1,5 @@
-export interface FormErrors {
-    [key: string]: {name: string, message: string};
-}
+import {IError} from "./types.ts";
+type FormErrors = Record<string, IError>;
 
 
 /**
@@ -8,5 +7,13 @@ export interface FormErrors {
  * @param data
  */
 export function hasFormErrors(data: any): data is {errors: FormErrors} {
-    return "errors" in data;
+    if (!(data && typeof data === "object" && data.errors && typeof data.errors === "object"))
+        return false;
+
+    for (const err of Object.values(data))
+        if (typeof err !== "object" || typeof (err as any).message !== "string" ||
+            typeof (err as any).name !== "string")
+            return false;
+
+    return true;
 }
