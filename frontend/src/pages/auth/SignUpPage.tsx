@@ -5,13 +5,12 @@ import urls from "../../urls";
 import {Link, useNavigate} from "react-router-dom";
 import Alert from "../../components/Alert.tsx";
 import React, {useRef, useState} from "react";
-import {FormErrors, hasFormErrors} from "../../utility/formValidation.ts";
+import {FormErrors} from "../../lib/formValidation.ts";
 
-import {ArrowPathIcon} from "@heroicons/react/24/solid";
 import Spinner from "../../components/icons/Spinner.tsx";
 import {EnvelopeIcon, LockClosedIcon, UserCircleIcon} from "@heroicons/react/24/outline";
 import {Transition} from "@headlessui/react";
-import debounce from "../../utility/debounce.ts";
+import debounce from "../../lib/debounce.ts";
 
 
 export default function SignUpPage() {

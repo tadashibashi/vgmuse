@@ -1,6 +1,6 @@
 import {FormEvent, PropsWithChildren} from "react";
 import {HttpMethod, sendForm} from "../api/requests.ts";
-import {FormErrors, hasFormErrors} from "../utility/formValidation.ts";
+import {FormErrors, hasFormErrors} from "../lib/formValidation.ts";
 
 interface Props extends PropsWithChildren {
     /**

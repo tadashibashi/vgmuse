@@ -2,7 +2,7 @@ import Form from "../../components/Form";
 import urls from "../../urls";
 
 import {Link, useNavigate} from "react-router-dom";
-import {FormErrors} from "../../utility/formValidation";
+import {FormErrors} from "../../lib/formValidation";
 import Alert from "../../components/Alert";
 import {useState} from "react";
 import Spinner from "../../components/icons/Spinner";
