@@ -2,8 +2,11 @@ import User from "../../models/User";
 import {Error} from "mongoose";
 import {sendEmail} from "../../api/email";
 import {reqEnv} from "../../lib/env";
-import {createToken} from "../../lib/jwt";
+import {createToken, verifyToken} from "../../lib/jwt";
 import {passUserToken, readUserToken} from "../../lib/userToken";
+import {InvalidRequestError, UnimplementedError} from "../../lib/errors";
+import jwt from "jsonwebtoken";
+import {Is} from "../../lib/types";
 
 
 
@@ -14,6 +17,60 @@ export const refreshUser = async function(req, res, next) {
         return res.json(user);
     } catch (e) {
         next(e);
+    }
+
+} as VGMuse.MiddlewareFunction;
+
+// POST /api/auth/reset-password/:token
+export const resetPassword = async function(req, res, next) {
+
+    const token = req.params["token"];
+    if (!token)
+        return next(new InvalidRequestError());
+
+    new UnimplementedError("resetPassword auth controller");
+    verifyToken(token);
+
+} as VGMuse.MiddlewareFunction;
+
+
+
+// POST /api/auth/activate/:token
+export const activateAccount = async function(req, res, next) {
+
+    const token = req.params["token"];
+    if (!token)
+        return next(new InvalidRequestError());
+
+    try {
+        const payload = verifyToken(token);
+
+        if (!Is.userActivationToken(payload)) {
+            return next(new InvalidRequestError());
+        }
+
+        const user = await User.findById(payload.user);
+        if (!user) {
+            return next(new InvalidRequestError());
+        }
+
+        if (user.isValidated) {
+            return next(new InvalidRequestError("Your account has already been validated"))
+        }
+
+        user.isValidated = true;
+        await user.save();
+
+        return res.json({result: "success"});
+
+    } catch (e) {
+        if (e instanceof jwt.JsonWebTokenError) {
+            return next(new InvalidRequestError("Your link contained an invalid token"));
+        } else if (e instanceof jwt.TokenExpiredError) {
+            return next(new InvalidRequestError("Your link has expired"));
+        } else {
+            return next(e);
+        }
     }
 
 } as VGMuse.MiddlewareFunction;
@@ -38,7 +95,6 @@ export const login = async function(req, res, next) {
     }
 
     const passwordCorrect = await user.checkPassword(password);
-
     if (!passwordCorrect) {
         return res.json(
             {
