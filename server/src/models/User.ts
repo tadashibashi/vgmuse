@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {HydratedDocument} from "mongoose";
 import {hash, hashCompare} from "../lib/hash";
 const Schema = mongoose.Schema;
 
@@ -10,10 +10,10 @@ const userSchema = new Schema<VGMuse.IUser>({
         required: [true, "username is missing"],
         unique: true,
         validate: {
-            validator: async function(v: string) {
+            validator: async function(this: HydratedDocument<VGMuse.IUser>, v: string) {
                 const ctor = this.constructor as mongoose.Model<any>;
                 const models = await ctor.find({username: v});
-                return models.length === 0;
+                return models.length === 0 || models[0]._id.equals(this._id);
             },
             message: "This username has already been taken",
         },
@@ -33,11 +33,11 @@ const userSchema = new Schema<VGMuse.IUser>({
             },
             // is unique email address?
             {
-                async validator(v: string) {
+                async validator(this: HydratedDocument<VGMuse.IUser>, v: string) {
                     const ctor = this.constructor as mongoose.Model<any>;
 
                     const models = await ctor.find({email: v});
-                    return models.length === 0;
+                    return models.length === 0 || models[0]._id.equals(this._id);
                 },
                 message: "An account with your email address already exists"
             }

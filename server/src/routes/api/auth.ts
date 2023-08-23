@@ -9,7 +9,7 @@ router.post("/login", formParser.textOnly(), authCtrl.login);
 router.post("/logout", authCtrl.logout);
 router.post("/signup", formParser.textOnly(),  authCtrl.signup);
 
-router.get("/activate", authCtrl.activateAccount);
+router.get("/activate/:token", authCtrl.activateAccount);
 router.get("/user", authCtrl.refreshUser);
 
 export default router;

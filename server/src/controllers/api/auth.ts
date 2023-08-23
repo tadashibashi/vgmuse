@@ -38,12 +38,13 @@ export const resetPassword = async function(req, res, next) {
 // POST /api/auth/activate/:token
 export const activateAccount = async function(req, res, next) {
 
-    const token = req.params["token"];
-    if (!token)
-        return next(new InvalidRequestError());
+    const encryptedToken = req.params["token"];
+    if (!encryptedToken)
+        return next(new InvalidRequestError("Parameter \"token\" was missing from request"));
 
     try {
-        const payload = verifyToken(token);
+
+        const payload = verifyToken(encryptedToken);
 
         if (!Is.userActivationToken(payload)) {
             return next(new InvalidRequestError());
