@@ -4,7 +4,7 @@ import {hashCompare} from "../hash";
 import {HydratedDocument} from "mongoose";
 import {sendEmail} from "../../api/email";
 import {reqEnv} from "../env";
-import {PORT} from "../../constants";
+import {DOMAIN, PORT} from "../../constants";
 
 
 const SALT_ROUNDS = 8;
@@ -28,7 +28,15 @@ function compareUserVerificationToken(userId: string, encrypted: string) {
 export async function sendVerificationEmail(user: VGMuse.Frontend.User | HydratedDocument<VGMuse.IUser>) {
 
     const token = await genUserVerificationToken(user._id.toString(), user.username);
-    const link = `http://localhost:${PORT}/auth/activate?token=${token}`;
+    let link: string;
+    let subpath = `auth/activate?token=${token}`;
+    if (DOMAIN === "localhost")
+        link = `http://localhost:${PORT}/${subpath}`;
+    else
+        link = `${DOMAIN}/${subpath}`;
+
+
+    const MaxLinkLength = 48;
 
     // send email
     return sendEmail(user.email, reqEnv("EMAIL_SENDER"), "Activate your VGMuse Account",
@@ -37,7 +45,7 @@ export async function sendVerificationEmail(user: VGMuse.Frontend.User | Hydrate
 <p>Thank you for registering your account at VGMuse! 
 Please click the link below to activate your account.<p>
 
-<a href="${link}">${link}</a>
+<a href="${link}">${link.substring(MaxLinkLength) + (link.length > MaxLinkLength ? "..." : "")}</a>
 
 <p>We hope you enjoy your new chiptune music space!</p>
 
