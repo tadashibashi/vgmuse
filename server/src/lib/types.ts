@@ -5,7 +5,7 @@ export interface IRefreshToken extends jwt.JwtPayload {
 }
 
 export interface IActivationToken extends jwt.JwtPayload {
-    user: string;
+    user: {id: string, name: string};
 }
 
 export namespace Is {
@@ -14,6 +14,7 @@ export namespace Is {
     }
 
     export function userActivationToken(payload: jwt.JwtPayload): payload is IActivationToken {
-        return typeof payload.user === "string";
+        return payload.user &&
+            typeof payload.user.name === "string" && typeof payload.user.id === "string";
     }
 }
