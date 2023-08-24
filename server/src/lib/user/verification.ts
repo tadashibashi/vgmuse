@@ -45,7 +45,7 @@ export async function sendVerificationEmail(user: VGMuse.Frontend.User | Hydrate
 <p>Thank you for registering your account at VGMuse! 
 Please click the link below to activate your account.<p>
 
-<a href="${link}">${link.substring(MaxLinkLength) + (link.length > MaxLinkLength ? "..." : "")}</a>
+<a href="${link}">${link.substring(0, MaxLinkLength) + (link.length > MaxLinkLength ? "..." : "")}</a>
 
 <p>We hope you enjoy your new chiptune music space!</p>
 
