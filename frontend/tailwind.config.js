@@ -24,6 +24,7 @@ export default {
             animation: {
                 "hover-slow": "hover 5s ease-in-out infinite",
                 "shadow-hover-slow": "shadow-hover 5s ease-in-out infinite",
+                "spin-slow": "spin 180s infinite linear"
             }
         },
     },
