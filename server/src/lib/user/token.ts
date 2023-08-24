@@ -1,10 +1,10 @@
 import {Response, Request} from "express";
 import {JwtPayload} from "jsonwebtoken";
-import {createToken, isPayloadExpired, verifyToken} from "./jwt";
-import {DOMAIN, PRODUCTION} from "./jwt/constants";
+import {createToken, isPayloadExpired, verifyToken} from "../jwt";
+import {DOMAIN, PRODUCTION} from "../jwt/constants";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import {User} from "../models";
+import {User} from "../../models";
 
 const ONE_YEAR =  31_556_952_000;
 const ONE_MONTH =  2_592_000_000;
@@ -15,7 +15,7 @@ const FIFTEEN_MINS = 900_000;
 const SALT_ROUNDS = 8;
 
 // passes user token to the frontend cookie
-export function passUserToken(user: VGMuse.Frontend.User, rememberMe: boolean, req: Request, res: Response) {
+export function passUserToken(user: VGMuse.Frontend.User | VGMuse.IUser, rememberMe: boolean, req: Request, res: Response) {
     let fingerprint = crypto.randomBytes(32).toString("hex");
 
     if (!rememberMe)
@@ -41,6 +41,7 @@ export function passUserToken(user: VGMuse.Frontend.User, rememberMe: boolean, r
     }
 
     const userToSend = {
+        _id: user._id,
         username: user.username,
         userType: user.userType,
         email: user.email,
@@ -73,7 +74,7 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
 
 
     // verify that token is Bearer auth type
-    if (token && !token.startsWith(AUTH_TYPE)) {
+    if (token) {
         if (token.startsWith(AUTH_TYPE))
             // remove "Bearer "
             token = token.slice(AUTH_TYPE.length);
@@ -92,11 +93,11 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
             return cleanUp();
         }
     }
-
-
-
+    console.log(token);
     // check that token valid and parse it
     const payload = verifyToken(token, true);
+    console.log("payload", payload);
+
     if (payload.error) {
         return cleanUp();
     }
@@ -136,7 +137,7 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
         return cleanUp();
     }
 
-
+    console.log("payload:", payload);
     return payload;
 
     // ----- Helpers -----
