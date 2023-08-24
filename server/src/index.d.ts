@@ -6,7 +6,8 @@ import {Types} from "mongoose";
 declare global {
     namespace VGMuse {
         namespace Frontend {
-            type User = Omit<IUser, "password" | "comparePasswords" | "isStaff" | "isAdmin" | "createdAt" | "updatedAt"> & {fingerprint?: string};
+            type User = Omit<IUser, "password" | "comparePasswords" | "isStaff" | "isAdmin" | "createdAt" | "updatedAt"> &
+                {fingerprint?: string, _id: string};
         }
 
         type Request = ExpressRequest & {user?: Frontend.User & {isStaff?: boolean, isAdmin?: boolean}};
@@ -30,7 +31,7 @@ declare global {
         }
 
         interface IUser extends ISchema, ITimeStamps {
-            username: string,
+            username: string;
             email: string;
             password: string;
             isValidated: boolean;
@@ -41,16 +42,12 @@ declare global {
             checkPassword: (password: string) => Promise<boolean>;
         }
 
-        interface IUserValidation extends ISchema, ITimeStamps {
-            // members
-
-            code: string,
-            user: Types.ObjectId;
-            validated: boolean;
-
-            // virtual
-
-            isExpired: boolean;
+        interface IVgm extends ISchema, ITimeStamps {
+            title: string; // unique to user
+            fileKey: string;
+            slug: string; // unique to user
+            user: Types.ObjectId; // user id
+            isPublished: boolean;
         }
 
     }
