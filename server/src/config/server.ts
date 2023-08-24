@@ -4,6 +4,8 @@ import router from "../routes/master";
 import cookieParser from "cookie-parser";
 import {ServerError} from "../lib/errors";
 import injectUser from "../middleware/injectUser";
+import mongoose from "mongoose";
+import {PRODUCTION} from "../lib/jwt/constants";
 
 function config(server: Express) {
     server.use(morgan("dev"));
@@ -23,8 +25,17 @@ function config(server: Express) {
         if (err instanceof ServerError) {
             res.status(err.statusCode);
             res.statusMessage = err.message;
-
             console.error(err.stack);
+
+        } else if (err instanceof mongoose.Error.ValidationError) {
+            // probably should be caught by the controller
+            res.status(400);
+            console.log(err.stack);
+
+            if (PRODUCTION)
+                return res.json({error: true});
+            else
+                return res.json(err);
 
         } else if (err instanceof Error) {
             res.status(500);
@@ -36,7 +47,10 @@ function config(server: Express) {
 
         }
 
-        res.json({ error: err });
+        if (PRODUCTION) // don't want to pass sensitive debug info to the client during production
+            res.json({ error: true });
+        else
+            res.json({error: err});
     });
 
 
