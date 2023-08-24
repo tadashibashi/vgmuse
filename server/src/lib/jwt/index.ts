@@ -12,7 +12,7 @@ const JWT_SECRET = reqEnv("JWT_SECRET");
  */
 export function createToken<T extends (object|Buffer) & {error?: unknown}>(payload: T, expiresIn: number|string="24h"): string {
     if (payload["error"])
-        throw Error("createToken: fieldName 'error' is reserved for server-side error handling, please remove from payload");
+        throw Error("createToken: fieldName 'error' is reserved for server-side error handling, please it remove from the payload");
     return jwt.sign(
         payload,
         JWT_SECRET,
