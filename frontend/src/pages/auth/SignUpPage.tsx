@@ -11,6 +11,7 @@ import Spinner from "../../components/icons/Spinner.tsx";
 import {EnvelopeIcon, LockClosedIcon, UserCircleIcon} from "@heroicons/react/24/outline";
 import {Transition} from "@headlessui/react";
 import debounce from "../../lib/debounce.ts";
+import LoadButton from "../../components/LoadButton.tsx";
 
 
 export default function SignUpPage() {
@@ -21,13 +22,12 @@ export default function SignUpPage() {
     // flag to prevent multiple submits
     const canSubmitRef = useRef<boolean>(true);
 
-    const submitCallbackRef = useRef(debounce(() => true, 500));
+    const preventSubmit = useRef(debounce(() => true, 500));
 
     const navigate = useNavigate();
 
 
     function onSuccess(data: unknown) {
-        console.log("received:", data);
         setSending(false);
         setShowErrors(false);
         // TODO: set user here
@@ -42,8 +42,7 @@ export default function SignUpPage() {
     }
 
     function shouldSubmit(formData: FormData): boolean {
-        if (!submitCallbackRef.current()) {
-            console.log("deBounce!");
+        if (!preventSubmit.current()) {
             return false;
         }
 
@@ -175,12 +174,7 @@ export default function SignUpPage() {
                 </div>
 
                 <div className="mt-24">
-                    <button
-                        type="submit"
-                        className="flex w-full justify-center rounded-md bg-violet-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
-                    >
-                        {sending && <Spinner className="me-2" bgClass="fill-violet-900" fgClass="fill-violet-200"/>} {sending ? "Processing..." : "Sign up"}
-                    </button>
+                    <LoadButton text="Sign up" isLoading={sending} type="submit" loadingText="Processing..." />
                 </div>
             </Form>
 

@@ -4,17 +4,21 @@ import urls from "../../urls";
 import {Link, useNavigate} from "react-router-dom";
 import {FormErrors} from "../../lib/formValidation";
 import Alert from "../../components/Alert";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import Spinner from "../../components/icons/Spinner";
 
 import {Transition} from "@headlessui/react";
 import {EnvelopeIcon, LockClosedIcon} from "@heroicons/react/24/outline";
+import LoadButton from "../../components/LoadButton.tsx";
+import debounce from "../../lib/debounce.ts";
 
 export default function LogInPage() {
     const [errors, setErrors] = useState<string[]>([]);
     const [showErrors, setShowErrors] = useState<boolean>(false);
     const [sending, setSending] = useState<boolean>(false);
     const navigate = useNavigate();
+
+    const preventSubmit = useRef(debounce(() => true, 500));
 
     function onValidationError(errors: FormErrors) {
         setErrors(Object.values(errors).map(err => err.message));
@@ -30,6 +34,7 @@ export default function LogInPage() {
     }
 
     function shouldSubmit() {
+        if (!preventSubmit.current()) return false;
         setSending(true);
         return true;
     }
@@ -125,12 +130,7 @@ export default function LogInPage() {
                 </div>
 
                 <div>
-                    <button
-                        type="submit"
-                        className="flex w-full justify-center rounded-md bg-violet-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
-                    >
-                        {sending && <Spinner className="me-2" bgClass="fill-violet-900" fgClass="fill-violet-200"/>} {sending ? "Processing..." : "Log in"}
-                    </button>
+                    <LoadButton text="Log in" isLoading={sending} type="submit" loadingText="Processing..." />
                 </div>
             </Form>
 

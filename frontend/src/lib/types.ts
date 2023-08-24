@@ -45,5 +45,19 @@ export namespace Is {
 
         return true;
     }
+
+
+    export function user(user: any): user is VGMuse.Frontend.User {
+        if (!user) return false;
+
+
+        return !!(user && user.username && user.userType && user.email && user.fingerprint);
+    }
+
+    export function userContainer(val: any): val is {user: VGMuse.Frontend.User} {
+        if (!val) return false;
+
+        return user(val.user);
+    }
 }
 

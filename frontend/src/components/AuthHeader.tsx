@@ -4,7 +4,7 @@ export default function AuthHeader({className}: {headerText: string, className?:
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <img
                     className="mx-auto h-20 w-auto filter pointer-events-none motion-safe:animate-hover-slow"
-                    src="/images/logo-v2.png"
+                    src="/images/logo/logo.png"
                     alt="VGMuse Logo"
                 />
                 <div className="flex flex-row justify-center relative">

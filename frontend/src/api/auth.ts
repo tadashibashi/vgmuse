@@ -9,25 +9,37 @@ export function getUserToken(): string | null {
     return getCookie("user") || null;
 }
 
-export function getUser(): string | null {
+
+export function getUser(): VGMuse.Frontend.User | null {
     const token = getUserToken();
     if (!token) return null;
 
-    return atob(token.split(".")[1]);
+    const userJson = atob(token.split(".")[1]);
+    const user = JSON.parse(userJson);
+    console.log(user);
+    if (!Is.userContainer(user))
+        return null;
+
+    return user.user;
 }
 
-// Get the current logged-in user
-export async function getBackendUser() {
+// Refresh the current logged-in user
+export async function refreshUser() {
     const user = await request("/api/auth/user");
     console.log(user);
     return user;
 }
 
 
-
 export async function resetPassword(token: string) {
-    const result = await request("/api/auth/reset-password/", "POST", {token});
-    if (Is.errorContainer(result)) {
+    return await request("/api/auth/reset-password/", "POST", {token});
+}
 
-    }
+export async function resendVerificationEmail() {
+    return await request("/api/auth/resend-verification", "POST");
+
+}
+
+export async function activateUser(token: string) {
+    return await request("/api/auth/activate/" + token.trim());
 }
