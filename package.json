@@ -2,6 +2,9 @@
   "name": "vgmuse",
   "version": "1.0.0",
   "description": "Chiptune music social platform",
+  "engines": {
+    "node": "20.5.0"
+  },
   "scripts": {
     "start": "cd frontend && npm i && npm run build && cd ../server && npm i && npm run start"
   },
@@ -9,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "ts-node": "^10.9.1"
   }
 }
