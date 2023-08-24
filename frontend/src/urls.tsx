@@ -4,6 +4,7 @@ import React from "react";
 import LandingPage from "./pages/LandingPage.tsx";
 import ValidationEmailSentPage from "./pages/auth/ValidationEmailSentPage.tsx";
 import AuthPages from "./pages/auth/AuthPages.tsx";
+import ValidationReceivedPage from "./pages/auth/ValidationReceivedPage.tsx";
 
 export interface URLDirectory {
     [key: string]: URLInfo
@@ -39,8 +40,11 @@ export const urls = {
             path: "/auth/email-sent",
             page: <ValidationEmailSentPage />
         } as URLInfo,
+        validationReceived: {
+            path: "/auth/activate",
+            page: <ValidationReceivedPage />
+        } as URLInfo,
     },
-
 };
 
 export default urls;
