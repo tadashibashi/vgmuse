@@ -5,6 +5,7 @@ import Alert from "../../components/Alert.tsx";
 import {Is} from "../../lib/types.ts";
 import {useQuery} from "../../hooks/useQuery.ts";
 import {Link} from "react-router-dom";
+import ButtonPrimary from "../../components/buttons/ButtonPrimary.tsx";
 
 
 
@@ -44,7 +45,7 @@ export default function ValidationReceivedPage() {
         return (err && err.message === "string");
     }
 
-    const debouncedResend = useDebounce(handleResend, 20000); // once every 20 seconds
+    const debouncedResend = useDebounce(handleResend, 15000); // once every 20 seconds
 
     async function handleResend(evt: React.MouseEvent) {
         const result = await resendVerificationEmail();
@@ -79,7 +80,7 @@ export default function ValidationReceivedPage() {
                         </Alert>
 
                         <div className="flex justify-center items-center">
-                            <Link to=""></Link>
+                            <Link to={urls.root.app.path}><ButtonPrimary /></Link>
                         </div>
                     </>
                 ))
