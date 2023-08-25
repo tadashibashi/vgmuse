@@ -8,6 +8,8 @@ import jwt, {JsonWebTokenError, TokenExpiredError} from "jsonwebtoken";
 import {Is} from "../../lib/types";
 import {hashCompare} from "../../lib/hash";
 import {sendVerificationEmail} from "../../lib/user/verification";
+import {DOMAIN} from "../../constants";
+import {PRODUCTION} from "../../lib/jwt/constants";
 
 
 
@@ -149,8 +151,10 @@ export const login = async function(req, res, next) {
 
 export const logout = function(req, res, next) {
     try {
-        res.clearCookie("user");
-        res.clearCookie("user-refresh")
+        res.clearCookie("user", {domain: DOMAIN, sameSite: "strict", secure: PRODUCTION});
+        res.clearCookie("user-refresh", {domain: DOMAIN, sameSite: "strict", secure: PRODUCTION, httpOnly: true});
+        res.clearCookie("fingerprint", {domain: DOMAIN, sameSite: "strict", secure: PRODUCTION, httpOnly: true});
+
         return res.json({success: "true"});
     } catch (e) {
         return next(e);
