@@ -264,8 +264,8 @@ export default function AppPages() {
                                     </ul>
                                 </li>
                                 <li className="mt-auto">
-                                    <a
-                                        href="#"
+                                    <Link
+                                        to="#"
                                         className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-violet-600"
                                     >
                                         <Cog6ToothIcon
@@ -273,7 +273,7 @@ export default function AppPages() {
                                             aria-hidden="true"
                                         />
                                         Settings
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </nav>
@@ -324,7 +324,7 @@ export default function AppPages() {
                                             user ? (
                                                 <img
                                                     className="h-8 w-8 rounded-full bg-gray-50"
-                                                    src={`https://picsum.photos/id/${parseInt(user._id.substring(0, 4), 16)}/64`}
+                                                    src={`https://picsum.photos/id/${parseInt(user._id.substring(user._id.length-4), 16) % 320}/64`}
                                                     alt=""
                                                 />
                                             ) : (
