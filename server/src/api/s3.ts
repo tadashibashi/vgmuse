@@ -9,6 +9,8 @@ import {StreamingBlobPayloadInputTypes} from "@smithy/types";
 
 const BUCKET = reqEnv("S3_BUCKET");
 
+export type UploadFile = StreamingBlobPayloadInputTypes;
+
 let _s3: S3Client | null = null;
 function getS3Client() {
     if (!_s3)
@@ -23,7 +25,7 @@ function getS3Client() {
     return _s3;
 }
 
-export async function uploadFile(key: string, body: StreamingBlobPayloadInputTypes) {
+export async function uploadFile(key: string, body: UploadFile) {
     const s3 = getS3Client();
 
     const res = await s3.send(new PutObjectCommand({
