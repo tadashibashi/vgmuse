@@ -43,3 +43,7 @@ export async function resendVerificationEmail() {
 export async function activateUser(token: string) {
     return await request("/api/auth/activate/" + token.trim());
 }
+
+export async function logout() {
+    return await request("/api/auth/logout");
+}
