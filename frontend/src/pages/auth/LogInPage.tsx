@@ -4,20 +4,31 @@ import urls from "../../urls";
 import {Link, useNavigate} from "react-router-dom";
 import {FormErrors} from "../../lib/formValidation";
 import Alert from "../../components/Alert";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 import {Transition} from "@headlessui/react";
 import {EnvelopeIcon, LockClosedIcon} from "@heroicons/react/24/outline";
 import LoadButton from "../../components/buttons/LoadButton.tsx";
 import debounce from "../../lib/debounce.ts";
+import {refreshUser} from "../../api/auth.ts";
 
 export default function LogInPage({redirectTo}: {redirectTo?: string}) {
     const [errors, setErrors] = useState<string[]>([]);
     const [showErrors, setShowErrors] = useState<boolean>(false);
     const [sending, setSending] = useState<boolean>(false);
     const navigate = useNavigate();
-
     const preventSubmit = useRef(debounce(() => true, 500));
+
+    useEffect(() => {
+        async function getBackendUser() {
+            const user = await refreshUser();
+            if (user) {
+                navigate(urls.root.app.path);
+            }
+        }
+
+        getBackendUser().catch(console.error);
+    }, []);
 
     function onValidationError(errors: FormErrors) {
         setErrors(Object.values(errors).map(err => err.message));
