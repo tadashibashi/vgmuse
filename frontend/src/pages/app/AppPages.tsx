@@ -29,9 +29,7 @@ const playlists = [
     { id: 3, name: 'Jazz', href: '#', initial: 'J', current: false },
 ];
 
-function onLogOut() {
-    return logout();
-}
+
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
@@ -41,6 +39,10 @@ export default function AppPages() {
 
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [user, setUser] = useState<VGMuse.Frontend.User | null>(null);
+    async function onLogOut() {
+        await logout();
+        setUser(getUser());
+    }
 
     const loggedInNavigation = [
         { name: 'Your profile', href: "#" },
@@ -325,7 +327,7 @@ export default function AppPages() {
                                                 <img
                                                     className="h-8 w-8 rounded-full bg-gray-50"
                                                     src={`https://picsum.photos/id/${parseInt(user._id.substring(user._id.length-4), 16) % 320}/64`}
-                                                    alt=""
+                                                    alt="profile picture"
                                                 />
                                             ) : (
                                                 <UserIcon className="h-8 w-8 rounded-full bg-gray-50 text-gray-100"/>
