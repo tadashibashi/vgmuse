@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import {Dialog} from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import urls from "../urls.tsx";
 import FadeIn from "../components/FadeIn.tsx";
 
@@ -14,6 +14,7 @@ const navdata = [
 
 export default function LandingPage() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const location = useLocation();
 
     return (
         <FadeIn>
@@ -89,7 +90,7 @@ export default function LandingPage() {
                                     </div>
                                     <div className="py-6">
                                         <Link
-                                            to={urls.auth.userLogin.path}
+                                            to={urls.auth.userLogin.path + "?last-page=" + encodeURIComponent(location.pathname)}
                                             className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                         >
                                             Log in

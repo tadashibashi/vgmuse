@@ -5,14 +5,13 @@ import {Link, useNavigate} from "react-router-dom";
 import {FormErrors} from "../../lib/formValidation";
 import Alert from "../../components/Alert";
 import {useRef, useState} from "react";
-import Spinner from "../../components/icons/Spinner";
 
 import {Transition} from "@headlessui/react";
 import {EnvelopeIcon, LockClosedIcon} from "@heroicons/react/24/outline";
 import LoadButton from "../../components/LoadButton.tsx";
 import debounce from "../../lib/debounce.ts";
 
-export default function LogInPage() {
+export default function LogInPage({redirectTo}: {redirectTo?: string}) {
     const [errors, setErrors] = useState<string[]>([]);
     const [showErrors, setShowErrors] = useState<boolean>(false);
     const [sending, setSending] = useState<boolean>(false);
@@ -30,7 +29,7 @@ export default function LogInPage() {
         setSending(false);
         setShowErrors(false);
         console.log(data);
-        navigate(urls.root.landingPage.path);
+        navigate(redirectTo || urls.root.app.path);
     }
 
     function shouldSubmit() {

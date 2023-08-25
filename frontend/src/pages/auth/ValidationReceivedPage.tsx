@@ -1,19 +1,11 @@
 import urls from "../../urls";
-import {Link, useLocation} from "react-router-dom";
-
-import {CheckCircleIcon} from "@heroicons/react/24/outline";
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import {activateUser, resendVerificationEmail} from "../../api/auth.ts";
-import {XCircleIcon} from "@heroicons/react/24/solid";
 import Alert from "../../components/Alert.tsx";
-import debounce from "../../lib/debounce.ts";
 import {Is} from "../../lib/types.ts";
+import {useQuery} from "../../hooks/useQuery.ts";
 
-function useQuery() {
-    const { search } = useLocation();
 
-    return useMemo(() => new URLSearchParams(search), [search]);
-}
 
 function useDebounce<Args extends any[], Ret extends any>(fn: (...args: Args) => Ret, ms: number) {
     const debouncedRef = useRef(() => {});
