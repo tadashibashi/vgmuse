@@ -25,6 +25,31 @@ function compareUserVerificationToken(userId: string, encrypted: string) {
     return hashCompare(userId, encrypted);
 }
 
+
+export async function sendPasswordResetEmail(user: VGMuse.Frontend.User | HydratedDocument<VGMuse.IUser>) {
+    const token = await genUserVerificationToken(user._id.toString(), user.username);
+    let link: string;
+    let subpath = `auth/reset-password?token=${token}`;
+    if (DOMAIN === "localhost")
+        link = `http://localhost:${PORT}/${subpath}`;
+    else
+        link = `https://${DOMAIN}/${subpath}`;
+
+    const MaxLinkLength = 48;
+
+    return sendEmail(user.email, reqEnv("EMAIL_SENDER"), "Password Reset your VGMuse Account",
+`
+<p>Hello {user.username},</p>
+<p>We sent this message to you because you requested a password reset for your VGMuse Account.</p>
+
+<p>To reset your password, please click the link below within the next 15 minutes: </p>
+<a href="${link}">${link.substring(0, MaxLinkLength) + (link.length > MaxLinkLength ? "..." : "")}</a>
+
+<p>Best Regards,</p>
+<p>The VGMuse Team</p>
+`);
+}
+
 export async function sendVerificationEmail(user: VGMuse.Frontend.User | HydratedDocument<VGMuse.IUser>) {
 
     const token = await genUserVerificationToken(user._id.toString(), user.username);
@@ -33,7 +58,7 @@ export async function sendVerificationEmail(user: VGMuse.Frontend.User | Hydrate
     if (DOMAIN === "localhost")
         link = `http://localhost:${PORT}/${subpath}`;
     else
-        link = `${DOMAIN}/${subpath}`;
+        link = `https://${DOMAIN}/${subpath}`;
 
 
     const MaxLinkLength = 48;
@@ -41,9 +66,10 @@ export async function sendVerificationEmail(user: VGMuse.Frontend.User | Hydrate
     // send email
     return sendEmail(user.email, reqEnv("EMAIL_SENDER"), "Activate your VGMuse Account",
 
-        `<p>Hello,</p>
+`
+<p>Hello,</p>
 <p>Thank you for registering your account at VGMuse! 
-Please click the link below to activate your account.<p>
+Please click the link below within the next 15 minutes to activate your account.<p>
 
 <a href="${link}">${link.substring(0, MaxLinkLength) + (link.length > MaxLinkLength ? "..." : "")}</a>
 
