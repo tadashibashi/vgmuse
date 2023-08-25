@@ -1,4 +1,4 @@
-import Spinner from "../icons/Spinner.tsx";
+import SpinnerIcon from "../icons/SpinnerIcon.tsx";
 import React, {PropsWithChildren, useState} from "react";
 import Button, {ButtonProps} from "./Button.tsx";
 import ButtonPrimary from "./ButtonPrimary.tsx";
@@ -17,7 +17,7 @@ export default function LoadButton(p: Props) {
     return (
           <ButtonPrimary type={p.type || "button"}
                   onClick={p.onClick}>
-                      {p.isLoading && <Spinner className="me-2" bgClass="fill-violet-900" fgClass="fill-violet-200"/>} {p.isLoading ? p.loadingText || p.text : p.text}
+                      {p.isLoading && <SpinnerIcon className="me-2" bgClass="fill-violet-900" fgClass="fill-violet-200"/>} {p.isLoading ? p.loadingText || p.text : p.text}
           </ButtonPrimary>
     );
 }
