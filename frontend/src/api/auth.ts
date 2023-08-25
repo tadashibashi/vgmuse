@@ -16,7 +16,7 @@ export function getUser(): VGMuse.Frontend.User | null {
 
     const userJson = atob(token.split(".")[1]);
     const user = JSON.parse(userJson);
-    console.log(user);
+
     if (!Is.userContainer(user))
         return null;
 
@@ -25,9 +25,7 @@ export function getUser(): VGMuse.Frontend.User | null {
 
 // Refresh the current logged-in user
 export async function refreshUser() {
-    const user = await request("/api/auth/user");
-    console.log(user);
-    return user;
+    return await request("/api/auth/refresh");
 }
 
 
@@ -45,5 +43,5 @@ export async function activateUser(token: string) {
 }
 
 export async function logout() {
-    return await request("/api/auth/logout");
+    return await request("/api/auth/logout", "POST");
 }
