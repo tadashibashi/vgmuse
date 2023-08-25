@@ -93,10 +93,9 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
             return cleanUp();
         }
     }
-    console.log(token);
+
     // check that token valid and parse it
     const payload = verifyToken(token, true);
-    console.log("payload", payload);
 
     if (payload.error) {
         return cleanUp();
@@ -137,7 +136,6 @@ export async function readUserToken(req: Request, res: Response): Promise<(JwtPa
         return cleanUp();
     }
 
-    console.log("payload:", payload);
     return payload;
 
     // ----- Helpers -----
