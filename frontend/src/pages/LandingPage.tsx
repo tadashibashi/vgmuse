@@ -54,6 +54,7 @@ export default function LandingPage() {
                             </Link>
                         </div>
                     </nav>
+
                     <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
                         <div className="fixed inset-0 z-50" />
                         <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
@@ -140,7 +141,7 @@ export default function LandingPage() {
 
                             <div className="mt-10 flex items-center justify-center gap-x-6">
                                 <Link
-                                    to="#"
+                                    to={urls.root.app.path}
                                     className="z-50 rounded-md bg-violet-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
                                 >
                                     Browse Music

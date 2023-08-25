@@ -4,6 +4,7 @@ import {activateUser, resendVerificationEmail} from "../../api/auth.ts";
 import Alert from "../../components/Alert.tsx";
 import {Is} from "../../lib/types.ts";
 import {useQuery} from "../../hooks/useQuery.ts";
+import {Link} from "react-router-dom";
 
 
 
@@ -76,6 +77,10 @@ export default function ValidationReceivedPage() {
                         <Alert type="confirm" title="Success">
                             <p>Your account has been activated</p>
                         </Alert>
+
+                        <div className="flex justify-center items-center">
+                            <Link to=""></Link>
+                        </div>
                     </>
                 ))
             }

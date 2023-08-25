@@ -11,7 +11,7 @@ import Spinner from "../../components/icons/Spinner.tsx";
 import {EnvelopeIcon, LockClosedIcon, UserCircleIcon} from "@heroicons/react/24/outline";
 import {Transition} from "@headlessui/react";
 import debounce from "../../lib/debounce.ts";
-import LoadButton from "../../components/LoadButton.tsx";
+import LoadButton from "../../components/buttons/LoadButton.tsx";
 
 
 export default function SignUpPage() {

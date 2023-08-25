@@ -8,7 +8,7 @@ import {useRef, useState} from "react";
 
 import {Transition} from "@headlessui/react";
 import {EnvelopeIcon, LockClosedIcon} from "@heroicons/react/24/outline";
-import LoadButton from "../../components/LoadButton.tsx";
+import LoadButton from "../../components/buttons/LoadButton.tsx";
 import debounce from "../../lib/debounce.ts";
 
 export default function LogInPage({redirectTo}: {redirectTo?: string}) {

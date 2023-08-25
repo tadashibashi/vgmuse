@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import {Fragment, useEffect, useState} from 'react'
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import {
     Bars3Icon,
@@ -6,28 +6,32 @@ import {
     ChartPieIcon,
     Cog6ToothIcon,
     MusicalNoteIcon, ShoppingCartIcon,
-    UsersIcon,
+    UserIcon,
     XMarkIcon,
 } from '@heroicons/react/24/outline'
 import {ChevronDownIcon, CodeBracketIcon, MagnifyingGlassIcon} from '@heroicons/react/20/solid'
 import Form from "../../components/Form.tsx";
+import {getUser, logout} from "../../api/auth.ts";
+import urls from "../../urls.tsx";
+import {Link} from "react-router-dom";
 
 const navigation = [
     { name: 'Library', href: '#', icon: BuildingLibraryIcon, current: true },
-    { name: 'Artist Dashboard', href: '#', icon: MusicalNoteIcon, current: false },
+    { name: 'Artists', href: '#', icon: MusicalNoteIcon, current: false },
     { name: 'Store', href: '#', icon: ShoppingCartIcon, current: false },
     { name: 'Scripts', href: '#', icon: CodeBracketIcon, current: false },
     { name: 'Stats', href: '#', icon: ChartPieIcon, current: false },
-]
+];
+
 const playlists = [
     { id: 1, name: '2023 Favorites', href: '#', initial: '2', current: false },
     { id: 2, name: 'Retro Jams', href: '#', initial: 'R', current: false },
     { id: 3, name: 'Jazz', href: '#', initial: 'J', current: false },
-]
-const userNavigation = [
-    { name: 'Your profile', href: '#' },
-    { name: 'Sign out', href: '#' },
-]
+];
+
+function onLogOut() {
+    return logout();
+}
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
@@ -37,6 +41,22 @@ export default function AppPages() {
 
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [user, setUser] = useState<VGMuse.Frontend.User | null>(null);
+
+    const loggedInNavigation = [
+        { name: 'Your profile', href: "#" },
+        { name: 'Log out', onClick: onLogOut },
+    ];
+
+    const guestNavigation = [
+        { name: "Log in", href: urls.auth.userLogin.path + "?last-page=" + urls.root.app.path },
+        { name: "Register", href: urls.auth.userSignUp.path + "?last-page=" + urls.root.app.path },
+    ];
+
+    const userNavigation = user ? loggedInNavigation : guestNavigation;
+
+    useEffect(() => {
+        setUser(getUser());
+    }, []);
 
     return (
         <>
@@ -98,8 +118,8 @@ export default function AppPages() {
                                                     <ul role="list" className="-mx-2 space-y-1">
                                                         {navigation.map((item) => (
                                                             <li key={item.name}>
-                                                                <a
-                                                                    href={item.href}
+                                                                <Link
+                                                                    to={item.href}
                                                                     className={classNames(
                                                                         item.current
                                                                             ? 'bg-gray-50 text-violet-600'
@@ -115,7 +135,7 @@ export default function AppPages() {
                                                                         aria-hidden="true"
                                                                     />
                                                                     {item.name}
-                                                                </a>
+                                                                </Link>
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -123,36 +143,38 @@ export default function AppPages() {
                                                 <li>
                                                     <div className="text-xs font-semibold leading-6 text-gray-400">Your playlists</div>
                                                     <ul role="list" className="-mx-2 mt-2 space-y-1">
-                                                        {playlists.map((team) => (
-                                                            <li key={team.name}>
-                                                                <a
-                                                                    href={team.href}
+                                                        {playlists.map((playlist) => (
+                                                            <li key={playlist.name}>
+                                                                <Link
+                                                                    to={playlist.href}
                                                                     className={classNames(
-                                                                        team.current
+                                                                        playlist.current
                                                                             ? 'bg-gray-50 text-violet-600'
                                                                             : 'text-gray-700 hover:text-violet-600 hover:bg-gray-50',
                                                                         'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                                                     )}
                                                                 >
-                              <span
-                                  className={classNames(
-                                      team.current
-                                          ? 'text-violet-600 border-violet-600'
-                                          : 'text-gray-400 border-gray-200 group-hover:border-violet-600 group-hover:text-violet-600',
-                                      'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white'
-                                  )}
-                              >
-                                {team.initial}
-                              </span>
-                                                                    <span className="truncate">{team.name}</span>
-                                                                </a>
+                                                            <span
+                                                                className={classNames(
+                                                                    playlist.current
+                                                                    ? 'text-violet-600 border-violet-600'
+                                                                    : 'text-gray-400 border-gray-200 group-hover:border-violet-600 group-hover:text-violet-600',
+                                                                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white'
+                                                                )}
+                                                            >
+                                                            {playlist.initial}
+                                                          </span>
+                                                                    <span className="truncate">{playlist.name}</span>
+                                                                </Link>
                                                             </li>
                                                         ))}
                                                     </ul>
                                                 </li>
+
+                                                {/*Settings*/}
                                                 <li className="mt-auto">
-                                                    <a
-                                                        href="#"
+                                                    <Link
+                                                        to="#"
                                                         className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-violet-600"
                                                     >
                                                         <Cog6ToothIcon
@@ -160,8 +182,9 @@ export default function AppPages() {
                                                             aria-hidden="true"
                                                         />
                                                         Settings
-                                                    </a>
+                                                    </Link>
                                                 </li>
+
                                             </ul>
                                         </nav>
                                     </div>
@@ -178,7 +201,7 @@ export default function AppPages() {
                         <div className="flex h-16 shrink-0 items-center">
                             <img
                                 className="h-8 w-auto"
-                                src="https://tailwindui.com/img/logos/mark.svg?color=violet&shade=600"
+                                src="/images/logo/logo.png"
                                 alt="Your Company"
                             />
                         </div>
@@ -188,8 +211,8 @@ export default function AppPages() {
                                     <ul role="list" className="-mx-2 space-y-1">
                                         {navigation.map((item) => (
                                             <li key={item.name}>
-                                                <a
-                                                    href={item.href}
+                                                <Link
+                                                    to={item.href}
                                                     className={classNames(
                                                         item.current
                                                             ? 'bg-gray-50 text-violet-600'
@@ -205,7 +228,7 @@ export default function AppPages() {
                                                         aria-hidden="true"
                                                     />
                                                     {item.name}
-                                                </a>
+                                                </Link>
                                             </li>
                                         ))}
                                     </ul>
@@ -213,29 +236,29 @@ export default function AppPages() {
                                 <li>
                                     <div className="text-xs font-semibold leading-6 text-gray-400">Your playlists</div>
                                     <ul role="list" className="-mx-2 mt-2 space-y-1">
-                                        {playlists.map((team) => (
-                                            <li key={team.name}>
-                                                <a
-                                                    href={team.href}
+                                        {playlists.map((playlist) => (
+                                            <li key={playlist.name}>
+                                                <Link
+                                                    to={playlist.href}
                                                     className={classNames(
-                                                        team.current
+                                                        playlist.current
                                                             ? 'bg-gray-50 text-violet-600'
                                                             : 'text-gray-700 hover:text-violet-600 hover:bg-gray-50',
                                                         'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                                     )}
                                                 >
-                      <span
-                          className={classNames(
-                              team.current
-                                  ? 'text-violet-600 border-violet-600'
-                                  : 'text-gray-400 border-gray-200 group-hover:border-violet-600 group-hover:text-violet-600',
-                              'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white'
-                          )}
-                      >
-                        {team.initial}
-                      </span>
-                                                    <span className="truncate">{team.name}</span>
-                                                </a>
+                                                    <span
+                                                        className={classNames(
+                                                            playlist.current
+                                                                ? 'text-violet-600 border-violet-600'
+                                                                : 'text-gray-400 border-gray-200 group-hover:border-violet-600 group-hover:text-violet-600',
+                                                            'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white'
+                                                        )}
+                                                    >
+                                                        {playlist.initial}
+                                                    </span>
+                                                    <span className="truncate">{playlist.name}</span>
+                                                </Link>
                                             </li>
                                         ))}
                                     </ul>
@@ -297,17 +320,24 @@ export default function AppPages() {
                                 <Menu as="div" className="relative">
                                     <Menu.Button className="-m-1.5 flex items-center p-1.5">
                                         <span className="sr-only">Open user menu</span>
-                                        <img
-                                            className="h-8 w-8 rounded-full bg-gray-50"
-                                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                            alt=""
-                                        />
+                                        {
+                                            user ? (
+                                                <img
+                                                    className="h-8 w-8 rounded-full bg-gray-50"
+                                                    src={`https://picsum.photos/id/${parseInt(user._id.substring(0, 4), 16)}/64`}
+                                                    alt=""
+                                                />
+                                            ) : (
+                                                <UserIcon className="h-8 w-8 rounded-full bg-gray-50 text-gray-100"/>
+                                            )
+                                        }
+
                                         <span className="hidden lg:flex lg:items-center">
-                  <span className="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
-                    Tom Cook
-                  </span>
-                  <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
-                </span>
+                                            <span className="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
+                                                {user ? user.username : "Guest"}
+                                            </span>
+                                            <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
+                                        </span>
                                     </Menu.Button>
                                     <Transition
                                         as={Fragment}
@@ -322,15 +352,16 @@ export default function AppPages() {
                                             {userNavigation.map((item) => (
                                                 <Menu.Item key={item.name}>
                                                     {({ active }) => (
-                                                        <a
-                                                            href={item.href}
+                                                        <Link
+                                                            to={item.href || ""}
+                                                            onClick={"onClick" in item ? item.onClick : undefined}
                                                             className={classNames(
                                                                 active ? 'bg-gray-50' : '',
                                                                 'block px-3 py-1 text-sm leading-6 text-gray-900'
                                                             )}
                                                         >
                                                             {item.name}
-                                                        </a>
+                                                        </Link>
                                                     )}
                                                 </Menu.Item>
                                             ))}

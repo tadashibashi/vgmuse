@@ -3,15 +3,15 @@ import FadeIn from "../../components/FadeIn";
 import {Routes} from "../../components/Routes";
 import urls from "../../urls";
 import {XMarkIcon} from "@heroicons/react/24/solid";
-import React, {useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {Link} from "react-router-dom";
-import {useQuery} from "../../hooks/useQuery.ts";
+import {useQuery, useConsumeQuery} from "../../hooks/useQuery.ts";
 import {getSubpaths} from "../../lib/paths.ts";
 
 
 
 export default function AuthPages() {
-    const query = useQuery();
+    const query = useConsumeQuery();
     const urlsRef = useRef(getSubpaths(urls.auth));
 
     return (
