@@ -5,10 +5,9 @@ import LandingPage from "./pages/LandingPage.tsx";
 import ValidationEmailSentPage from "./pages/auth/ValidationEmailSentPage.tsx";
 import AuthPages from "./pages/auth/AuthPages.tsx";
 import ValidationReceivedPage from "./pages/auth/ValidationReceivedPage.tsx";
+import AppPages from "./pages/app/AppPages.tsx";
 
-export interface URLDirectory {
-    [key: string]: URLInfo
-}
+export type URLDirectory = Record<string, URLInfo>;
 
 export interface URLInfo {
     path: string;
@@ -24,10 +23,18 @@ export const urls = {
         auth: {
             path: "/auth/*",
             page: <AuthPages />
-        } as URLInfo
+        } as URLInfo,
+        app: {
+            path: "/app/*",
+            page: <AppPages />
+        } as URLInfo,
     },
 
     auth: {
+        index: {
+            path: "/auth",
+            page: <></>
+        },
         userLogin: {
             path: "/auth/login",
             page: <LogInPage />
