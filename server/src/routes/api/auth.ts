@@ -11,8 +11,12 @@ router.post("/logout", authCtrl.logout);
 router.post("/signup", formParser.textOnly(),  authCtrl.signup);
 
 router.get("/activate/:token", authCtrl.activateAccount);
-router.get("/user", authCtrl.refreshUser);
+
+// updates user status, refreshing any expired user if there is a refresh-token
+router.get("/refresh", authCtrl.refreshUser);
 
 router.post("/resend-verification", loginRequired(), authCtrl.resendVerificationEmail);
+
+router.post("/reset-password", authCtrl.resetPassword);
 
 export default router;

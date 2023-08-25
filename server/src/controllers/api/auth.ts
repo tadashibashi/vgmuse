@@ -4,7 +4,7 @@ import {Error} from "mongoose";
 import {verifyToken} from "../../lib/jwt";
 import {passUserToken, readUserToken} from "../../lib/user/token";
 import {InvalidRequestError, UnimplementedError} from "../../lib/errors";
-import jwt from "jsonwebtoken";
+import jwt, {JsonWebTokenError, TokenExpiredError} from "jsonwebtoken";
 import {Is} from "../../lib/types";
 import {hashCompare} from "../../lib/hash";
 import {sendVerificationEmail} from "../../lib/user/verification";
@@ -36,8 +36,22 @@ export const resetPassword = async function(req, res, next) {
     if (!token)
         return next(new InvalidRequestError("Missing \"token\" parameter"));
 
-    new UnimplementedError("resetPassword auth controller");
-    verifyToken(token);
+    try {
+        const payload = verifyToken(token);
+
+        if (!Is.userActivationToken(payload)) {
+            return res.json(new InvalidRequestError("Invalid token"));
+        }
+
+    } catch (err) {
+        if (err instanceof JsonWebTokenError || err instanceof TokenExpiredError)
+            return res.json(err);
+    }
+
+
+
+
+
 
 } as VGMuse.MiddlewareFunction;
 
@@ -60,7 +74,7 @@ export const activateAccount = async function(req, res, next) {
             else
                 return next(new InvalidRequestError("Invalid token"));
         }
-        console.log("payload of verification token", payload);
+
         if (!Is.userActivationToken(payload)) {
             return next(new InvalidRequestError());
         }
