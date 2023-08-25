@@ -7,7 +7,7 @@ import Alert from "../../components/Alert.tsx";
 import React, {useRef, useState} from "react";
 import {FormErrors} from "../../lib/formValidation";
 
-import Spinner from "../../components/icons/Spinner.tsx";
+import SpinnerIcon from "../../components/icons/SpinnerIcon.tsx";
 import {EnvelopeIcon, LockClosedIcon, UserCircleIcon} from "@heroicons/react/24/outline";
 import {Transition} from "@headlessui/react";
 import debounce from "../../lib/debounce.ts";
