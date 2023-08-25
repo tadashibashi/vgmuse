@@ -14,6 +14,7 @@ import Form from "../../components/Form.tsx";
 import {getUser, logout} from "../../api/auth.ts";
 import urls from "../../urls.tsx";
 import {Link} from "react-router-dom";
+import {navigateService} from "../../services";
 
 const navigation = [
     { name: 'Library', href: '#', icon: BuildingLibraryIcon, current: true },
@@ -42,6 +43,7 @@ export default function AppPages() {
     async function onLogOut() {
         await logout();
         setUser(getUser());
+        navigateService.get()(urls.root.landingPage.path);
     }
 
     const loggedInNavigation = [
