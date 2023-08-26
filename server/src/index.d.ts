@@ -1,5 +1,6 @@
 import {NextFunction, Request as ExpressRequest, Response} from "express";
 import {Types} from "mongoose";
+import {UploadFile} from "./api/s3";
 
 
 
@@ -10,7 +11,18 @@ declare global {
                 {fingerprint?: string, _id: string};
         }
 
-        type Request = ExpressRequest & {user?: Frontend.User & {isStaff?: boolean, isAdmin?: boolean}};
+        interface FileData {
+            file: NodeJS.ReadableStream;
+            filename: string;
+            mimetype: string;
+            encoding: string;
+        }
+
+        type Request = ExpressRequest & {
+            user?: Frontend.User & {isStaff?: boolean, isAdmin?: boolean},
+            files?: Record<string, FileData>;
+        };
+
         type UserType = "user" | "staff" | "admin";
 
         export type MiddlewareFunction = ((req: Request, res: Response, next: NextFunction) => void) |
