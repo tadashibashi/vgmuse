@@ -12,7 +12,7 @@ import LoadButton from "../../components/buttons/LoadButton.tsx";
 import debounce from "../../lib/debounce.ts";
 import {refreshUser} from "../../api/auth.ts";
 
-export default function LogInPage({redirectTo}: {redirectTo?: string}) {
+export default function LogInPage() {
     const [errors, setErrors] = useState<string[]>([]);
     const [showErrors, setShowErrors] = useState<boolean>(false);
     const [sending, setSending] = useState<boolean>(false);
@@ -40,7 +40,7 @@ export default function LogInPage({redirectTo}: {redirectTo?: string}) {
         setSending(false);
         setShowErrors(false);
         console.log(data);
-        navigate(redirectTo || urls.root.app.path);
+        navigate(urls.root.app.path);
     }
 
     function shouldSubmit() {
