@@ -19,11 +19,10 @@ export function useQuery() {
 export const useConsumeQuery = (stripQuery: boolean = true) => {
     const { pathname, search } = useLocation();
     const query = useState(() => new URLSearchParams(search));
-
     if (stripQuery) {
         useEffect(() => {
                 window.history.replaceState(null, "", pathname);
-        }, []);
+        }, [search]);
     }
 
     return query[0];
