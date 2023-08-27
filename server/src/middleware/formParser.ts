@@ -1,5 +1,6 @@
 import busboy, {FileInfo} from "busboy";
 import {InvalidRequestError} from "../lib/errors";
+import stream from "stream";
 
 /**
  * Parse header containing FormData, made available in `req.body`
@@ -35,12 +36,10 @@ interface FilesOpts {
     fileFilter?: (name: string, stream: NodeJS.ReadableStream, info: FileInfo) => boolean;
 }
 
-function cleanUpFiles(files: Record<string, VGMuse.FileData>) {
-    for (const fileData of Object.values(files))
-        fileData.file.resume();
-}
-
-
+/**
+ * Injects `req.files` with buffers of the files uploaded from the frontend
+ * @param opts
+ */
 export const files = function(opts?: FilesOpts) {
     return function(req, res, next) {
         const files: Record<string, VGMuse.FileData> = {};
@@ -53,22 +52,25 @@ export const files = function(opts?: FilesOpts) {
                 body[name] = value;
             });
 
-            bb.on("file", (name, stream, info) => {
-                files[name] = {
-                    file: stream,
-                    filename: info.filename,
-                    mimetype: info.mimeType,
-                    encoding: info.encoding,
-                };
+            bb.on("file", (name, strm, info) => {
+                const chunks: Array<Uint8Array> = [];
+
+                strm.on("data", chunk => chunks.push(chunk));
+                strm.on("close", () => {
+                    files[name] = {
+                        buffer: Buffer.concat(chunks),
+                        filename: info.filename,
+                        mimetype: info.mimeType,
+                        encoding: info.encoding,
+                    };
+                });
             });
 
             bb.on("filesLimit", () => {
-                cleanUpFiles(files);
                 next(new InvalidRequestError("Files limit exceeded"));
             });
 
             bb.on("fieldsLimit", () => {
-                cleanUpFiles(files);
                 next(new InvalidRequestError("Fields limit exceeded"));
             });
 
@@ -81,7 +83,6 @@ export const files = function(opts?: FilesOpts) {
             req.pipe(bb);
         }
         catch (err) {
-            cleanUpFiles(files);
             next(err);
         }
 
