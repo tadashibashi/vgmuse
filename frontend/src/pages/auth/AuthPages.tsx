@@ -3,12 +3,12 @@ import FadeIn from "../../components/FadeIn";
 import {Routes} from "../../components/Routes";
 import urls from "../../urls";
 import {XMarkIcon} from "@heroicons/react/24/solid";
-import React, {useEffect, useRef} from "react";
+import React, {createContext, useRef} from "react";
 import {Link} from "react-router-dom";
-import {useQuery, useConsumeQuery} from "../../hooks/useQuery.ts";
+import {useConsumeQuery} from "../../hooks/useQuery.ts";
 import {getSubpaths} from "../../lib/paths.ts";
 
-
+export const queryCtx = createContext<URLSearchParams>(new URLSearchParams);
 
 export default function AuthPages() {
     const query = useConsumeQuery();
@@ -30,7 +30,10 @@ export default function AuthPages() {
             </div>
 
             <div className="mt-10 mx-8 sm:mx-auto sm:w-full sm:max-w-sm border-gray-100 ">
-                <Routes urls={urlsRef.current} />
+                <queryCtx.Provider value={query}>
+                    <Routes urls={urlsRef.current} />
+                </queryCtx.Provider>
+
             </div>
         </FadeIn>
     );
