@@ -4,30 +4,41 @@ import {
     Bars3Icon,
     BellIcon, BuildingLibraryIcon,
     ChartPieIcon,
-    Cog6ToothIcon,
+    Cog6ToothIcon, GlobeEuropeAfricaIcon,
     MusicalNoteIcon, ShoppingCartIcon,
+    ArrowUpOnSquareStackIcon,
     UserIcon,
     XMarkIcon,
 } from '@heroicons/react/24/outline'
-import {ChevronDownIcon, CodeBracketIcon, MagnifyingGlassIcon} from '@heroicons/react/20/solid'
+import {
+    ChevronDownIcon,
+    CodeBracketIcon,
+    MagnifyingGlassIcon
+} from '@heroicons/react/20/solid'
 import Form from "../../components/Form.tsx";
 import {getUser, logout} from "../../api/auth.ts";
-import urls from "../../urls.tsx";
-import {Link} from "react-router-dom";
+import urls, {URLDirectory} from "../../urls.tsx";
+import {Link, Route, useLocation} from "react-router-dom";
 import {navigateService} from "../../services";
+import {getSubpaths} from "../../lib/paths.ts";
+import {Routes} from "../../components/Routes";
 
-const navigation = [
-    { name: 'Library', href: '#', icon: BuildingLibraryIcon, current: true },
-    { name: 'Artists', href: '#', icon: MusicalNoteIcon, current: false },
-    { name: 'Store', href: '#', icon: ShoppingCartIcon, current: false },
-    { name: 'Scripts', href: '#', icon: CodeBracketIcon, current: false },
-    { name: 'Stats', href: '#', icon: ChartPieIcon, current: false },
+const userNavbar = [
+    { name: "Explore", href: "/app/explore", icon: GlobeEuropeAfricaIcon, current: true },
+    { name: "Tracks", href: "/app/my-tracks", icon: MusicalNoteIcon, current: false },
+    { name: "Upload", href: "/app/upload-track", icon: ArrowUpOnSquareStackIcon, current: false }
+    // { name: 'Store', href: '#', icon: ShoppingCartIcon, current: false },
+    // { name: 'Scripts', href: '#', icon: CodeBracketIcon, current: false },
+    // { name: 'Stats', href: '#', icon: ChartPieIcon, current: false },
 ];
 
+const guestNavbar = [
+    { name: "Explore", href: "/app/explore", icon: GlobeEuropeAfricaIcon, current: true }
+]
+
 const playlists = [
-    { id: 1, name: '2023 Favorites', href: '#', initial: '2', current: false },
-    { id: 2, name: 'Retro Jams', href: '#', initial: 'R', current: false },
-    { id: 3, name: 'Jazz', href: '#', initial: 'J', current: false },
+    { id: 1, name: 'Coming Soon...', href: '#', initial: 'C', current: false },
+
 ];
 
 
@@ -37,9 +48,14 @@ function classNames(...classes: string[]) {
 }
 
 export default function AppPages() {
-
+    const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [user, setUser] = useState<VGMuse.Frontend.User | null>(null);
+
+    const [pages, setPages] = useState<URLDirectory>(() => getSubpaths(urls.app));
+
+    const navbar = user ? userNavbar : guestNavbar;
+
     async function onLogOut() {
         await logout();
         setUser(getUser());
@@ -64,147 +80,75 @@ export default function AppPages() {
 
     return (
         <>
-
             <div>
-                <Transition.Root show={sidebarOpen} as={Fragment}>
-                    <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="transition-opacity ease-linear duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="transition-opacity ease-linear duration-300"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0 bg-gray-900/80" />
-                        </Transition.Child>
 
-                        <div className="fixed inset-0 flex">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="transition ease-in-out duration-300 transform"
-                                enterFrom="-translate-x-full"
-                                enterTo="translate-x-0"
-                                leave="transition ease-in-out duration-300 transform"
-                                leaveFrom="translate-x-0"
-                                leaveTo="-translate-x-full"
-                            >
-                                <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
-                                    <Transition.Child
-                                        as={Fragment}
-                                        enter="ease-in-out duration-300"
-                                        enterFrom="opacity-0"
-                                        enterTo="opacity-100"
-                                        leave="ease-in-out duration-300"
-                                        leaveFrom="opacity-100"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                                            <button type="button" className="-m-2.5 p-2.5" onClick={() => setSidebarOpen(false)}>
-                                                <span className="sr-only">Close sidebar</span>
-                                                <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
-                                            </button>
-                                        </div>
-                                    </Transition.Child>
-                                    {/* Sidebar component, swap this element with another sidebar if you like */}
-                                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
-                                        <div className="flex h-16 shrink-0 items-center">
-                                            <img
-                                                className="h-8 w-auto"
-                                                src="/images/logo/icon-lg.png"
-                                                alt="Your Company"
-                                            />
-                                        </div>
-                                        <nav className="flex flex-1 flex-col">
-                                            <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                                                <li>
-                                                    <ul role="list" className="-mx-2 space-y-1">
-                                                        {navigation.map((item) => (
-                                                            <li key={item.name}>
-                                                                <Link
-                                                                    to={item.href}
-                                                                    className={classNames(
-                                                                        item.current
-                                                                            ? 'bg-gray-50 text-violet-600'
-                                                                            : 'text-gray-700 hover:text-violet-600 hover:bg-gray-50',
-                                                                        'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                                                                    )}
-                                                                >
-                                                                    <item.icon
-                                                                        className={classNames(
-                                                                            item.current ? 'text-violet-600' : 'text-gray-400 group-hover:text-violet-600',
-                                                                            'h-6 w-6 shrink-0'
-                                                                        )}
-                                                                        aria-hidden="true"
-                                                                    />
-                                                                    {item.name}
-                                                                </Link>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </li>
-                                                <li>
-                                                    <div className="text-xs font-semibold leading-6 text-gray-400">Your playlists</div>
-                                                    <ul role="list" className="-mx-2 mt-2 space-y-1">
-                                                        {playlists.map((playlist) => (
-                                                            <li key={playlist.name}>
-                                                                <Link
-                                                                    to={playlist.href}
-                                                                    className={classNames(
-                                                                        playlist.current
-                                                                            ? 'bg-gray-50 text-violet-600'
-                                                                            : 'text-gray-700 hover:text-violet-600 hover:bg-gray-50',
-                                                                        'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                                                                    )}
-                                                                >
-                                                            <span
-                                                                className={classNames(
-                                                                    playlist.current
-                                                                    ? 'text-violet-600 border-violet-600'
-                                                                    : 'text-gray-400 border-gray-200 group-hover:border-violet-600 group-hover:text-violet-600',
-                                                                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white'
-                                                                )}
-                                                            >
-                                                            {playlist.initial}
-                                                          </span>
-                                                                    <span className="truncate">{playlist.name}</span>
-                                                                </Link>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </li>
-
-                                                {/*Settings*/}
-                                                <li className="mt-auto">
-                                                    <Link
-                                                        to="#"
-                                                        className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-violet-600"
-                                                    >
-                                                        <Cog6ToothIcon
-                                                            className="h-6 w-6 shrink-0 text-gray-400 group-hover:text-violet-600"
+                {/* Static sidebar for mobile */}
+                <div className="fixed inset-y-0 z-50 flex w-18 flex-col lg:hidden">
+                    {/* Sidebar component, swap this element with another sidebar if you like */}
+                    <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white pb-4">
+                        <div className="flex w-auto items-center">
+                            <img
+                                className="h-12 w-12 mx-auto mt-1 drop-shadow-md"
+                                src="/images/logo/logo.png"
+                                alt="Your Company"
+                            />
+                        </div>
+                        <nav className="flex flex-1 flex-col">
+                            <ul role="list" className="flex flex-1 flex-col gap-y-7 items-center">
+                                <li>
+                                    <ul role="list" className="space-y-1">
+                                        {navbar.map((item) => (
+                                            <li key={item.name} className="w-auto px-2">
+                                                <Link
+                                                    to={item.href}
+                                                    className={classNames(
+                                                        location.pathname.startsWith(item.href)
+                                                            ? 'bg-gray-50 text-violet-600 shadow-sm'
+                                                            : 'text-gray-700 hover:text-violet-600 hover:bg-[#fdfdfd]',
+                                                        'group flex gap-x-3 rounded-md py-2 px-4 text-sm leading-6 font-semibold justify-center'
+                                                    )}
+                                                >
+                                                    <div className="flex-col justify-center items-center p-0">
+                                                        <item.icon
+                                                            className={classNames(
+                                                                location.pathname.startsWith(item.href) ? 'text-violet-600' : 'text-gray-400 group-hover:text-violet-600',
+                                                                'w-auto shrink-0'
+                                                            )}
                                                             aria-hidden="true"
                                                         />
-                                                        Settings
-                                                    </Link>
-                                                </li>
+                                                        <p className="text-center text-tiny">{item.name}</p>
 
-                                            </ul>
-                                        </nav>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </Dialog>
-                </Transition.Root>
+                                                    </div>
+
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </li>
+
+                                <li className="mt-auto">
+                                    <Link
+                                        to="#"
+                                        className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-violet-600"
+                                    >
+                                        <Cog6ToothIcon
+                                            className="h-6 w-6 shrink-0 text-gray-400 group-hover:text-violet-600"
+                                            aria-hidden="true"
+                                        />
+                                    </Link>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
 
                 {/* Static sidebar for desktop */}
-                <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+                <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-48 lg:flex-col">
                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                    <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
-                        <div className="flex h-16 shrink-0 items-center">
+                    <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
+                        <div className="flex h-12 shrink-0 items-center">
                             <img
-                                className="h-8 w-auto"
+                                className="h-12 w-auto mx-auto mt-2 drop-shadow-sm"
                                 src="/images/logo/logo.png"
                                 alt="Your Company"
                             />
@@ -213,12 +157,12 @@ export default function AppPages() {
                             <ul role="list" className="flex flex-1 flex-col gap-y-7">
                                 <li>
                                     <ul role="list" className="-mx-2 space-y-1">
-                                        {navigation.map((item) => (
+                                        {navbar.map((item) => (
                                             <li key={item.name}>
                                                 <Link
                                                     to={item.href}
                                                     className={classNames(
-                                                        item.current
+                                                        location.pathname.startsWith(item.href)
                                                             ? 'bg-gray-50 text-violet-600'
                                                             : 'text-gray-700 hover:text-violet-600 hover:bg-gray-50',
                                                         'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
@@ -226,7 +170,7 @@ export default function AppPages() {
                                                 >
                                                     <item.icon
                                                         className={classNames(
-                                                            item.current ? 'text-violet-600' : 'text-gray-400 group-hover:text-violet-600',
+                                                            location.pathname.startsWith(item.href) ? 'text-violet-600' : 'text-gray-400 group-hover:text-violet-600',
                                                             'h-6 w-6 shrink-0'
                                                         )}
                                                         aria-hidden="true"
@@ -238,14 +182,14 @@ export default function AppPages() {
                                     </ul>
                                 </li>
                                 <li>
-                                    <div className="text-xs font-semibold leading-6 text-gray-400">Your playlists</div>
+                                    <div className="text-xs font-semibold leading-6 text-gray-400">Playlists</div>
                                     <ul role="list" className="-mx-2 mt-2 space-y-1">
                                         {playlists.map((playlist) => (
                                             <li key={playlist.name}>
                                                 <Link
                                                     to={playlist.href}
                                                     className={classNames(
-                                                        playlist.current
+                                                        location.pathname.startsWith(playlist.href)
                                                             ? 'bg-gray-50 text-violet-600'
                                                             : 'text-gray-700 hover:text-violet-600 hover:bg-gray-50',
                                                         'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
@@ -253,7 +197,7 @@ export default function AppPages() {
                                                 >
                                                     <span
                                                         className={classNames(
-                                                            playlist.current
+                                                            location.pathname.startsWith(playlist.href)
                                                                 ? 'text-violet-600 border-violet-600'
                                                                 : 'text-gray-400 border-gray-200 group-hover:border-violet-600 group-hover:text-violet-600',
                                                             'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white'
@@ -284,18 +228,11 @@ export default function AppPages() {
                     </div>
                 </div>
 
-                <div className="lg:pl-72">
+                <div className="pl-[84px] lg:pl-48">
                     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-                        <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
-                            <span className="sr-only">Open sidebar</span>
-                            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-                        </button>
 
-                        {/* Separator */}
-                        <div className="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
-
-                        <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-                            <Form shouldSubmit={() => false} className="relative flex flex-1" action="#" method="GET">
+                        <div className="flex flex-1 gap-x-4 self-stretch">
+                            <Form shouldSubmit={() => false} className="relative flex flex-1" action={urls.app.explore.path} method="GET">
                                 <label htmlFor="search-field" className="sr-only">
                                     Search
                                 </label>
@@ -377,7 +314,9 @@ export default function AppPages() {
                     </div>
 
                     <main className="py-10">
-                        <div className="px-4 sm:px-6 lg:px-8">{/* Your content */}</div>
+                        <div className="px-4 sm:px-6 lg:px-8">
+                            <Routes urls={pages} />
+                        </div>
                     </main>
                 </div>
             </div>
