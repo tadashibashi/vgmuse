@@ -10,6 +10,7 @@ import {hashCompare} from "../../lib/hash";
 import {sendVerificationEmail} from "../../lib/user/verification";
 import {DOMAIN} from "../../constants";
 import {PRODUCTION} from "../../lib/jwt/constants";
+import {CookieOptions} from "express";
 
 
 
@@ -147,13 +148,31 @@ export const login = async function(req, res, next) {
 
 } as VGMuse.MiddlewareFunction;
 
+function makeOpts(httpOnly: boolean): Partial<CookieOptions> {
+    return DOMAIN === "localhost" ? {
+        sameSite: "strict",
+        secure: PRODUCTION,
+        httpOnly,
+    } : {
+        domain: DOMAIN,
+        sameSite: "strict",
+        secure: PRODUCTION,
+        httpOnly,
+    };
+}
 
-
+/**
+ * Log out current user, removing all user-related cookies
+ * Path: POST /api/auth/logout
+ */
 export const logout = function(req, res, next) {
+    const httpOnlyOpts = makeOpts(true);
+    const opts = makeOpts(false);
+
     try {
-        res.clearCookie("user", {domain: DOMAIN, sameSite: "strict", secure: PRODUCTION});
-        res.clearCookie("user-refresh", {domain: DOMAIN, sameSite: "strict", secure: PRODUCTION, httpOnly: true});
-        res.clearCookie("fingerprint", {domain: DOMAIN, sameSite: "strict", secure: PRODUCTION, httpOnly: true});
+        res.clearCookie("user", opts);
+        res.clearCookie("user-refresh", httpOnlyOpts);
+        res.clearCookie("fingerprint", httpOnlyOpts);
 
         return res.json({success: "true"});
     } catch (e) {
