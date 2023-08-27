@@ -7,6 +7,8 @@ import {loginRequired} from "../../middleware/loginRequired";
 const router = express.Router();
 
 router.get("/:username/:slug", vgmCtrl.readOne);
-router.delete("/:username/:slug", vgmCtrl.deleteOne);
-router.post("/", formParser.files(), vgmCtrl.createOne);
-router.patch("/:username/:slug", vgmCtrl.updateOne);
+router.delete("/:username/:slug", loginRequired(), vgmCtrl.deleteOne);
+router.post("/", formParser.files(), loginRequired(), vgmCtrl.createOne);
+router.patch("/:username/:slug", loginRequired(), vgmCtrl.updateOne);
+
+export default router;
