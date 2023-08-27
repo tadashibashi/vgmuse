@@ -1,6 +1,5 @@
 import busboy, {FileInfo} from "busboy";
 import {InvalidRequestError} from "../lib/errors";
-import stream from "stream";
 
 /**
  * Parse header containing FormData, made available in `req.body`
@@ -48,15 +47,27 @@ export const files = function(opts?: FilesOpts) {
         try {
             const bb = busboy({headers: req.headers, limits: opts?.limits});
 
+            // error helper, stops upload process, sends error to client-side
+            // make sure all messages contain client-presentable messages.
+            async function throwError<T extends Error>(error: T) {
+                req.unpipe(bb);
+                return res.json(error);
+            }
+
+            // non-file field listener
             bb.on("field", (name, value) => {
                 body[name] = value;
             });
 
-            bb.on("file", (name, strm, info) => {
-                const chunks: Array<Uint8Array> = [];
+            // file field listener
+            bb.on("file", (name, fileStrm, info) => {
 
-                strm.on("data", chunk => chunks.push(chunk));
-                strm.on("close", () => {
+                // collect chunks of file data
+                const chunks: Array<Uint8Array> = [];
+                fileStrm.on("data", chunk => chunks.push(chunk));
+
+                // save chunks and info into files object
+                fileStrm.on("close", () => {
                     files[name] = {
                         buffer: Buffer.concat(chunks),
                         filename: info.filename,
@@ -66,14 +77,17 @@ export const files = function(opts?: FilesOpts) {
                 });
             });
 
+            // when too many files
             bb.on("filesLimit", () => {
-                next(new InvalidRequestError("Files limit exceeded"));
+                return throwError(new InvalidRequestError("Files limit exceeded"));
             });
 
+            // when too many fields
             bb.on("fieldsLimit", () => {
-                next(new InvalidRequestError("Fields limit exceeded"));
+                return throwError(new InvalidRequestError("Fields limit exceeded"));
             });
 
+            // when finished processing
             bb.on("close", () => {
                 req.files = files;
                 req.body = body;
@@ -89,6 +103,8 @@ export const files = function(opts?: FilesOpts) {
     } as VGMuse.MiddlewareFunction;
 }
 
+// optional default export
 export default {
     textOnly,
+    files,
 };
