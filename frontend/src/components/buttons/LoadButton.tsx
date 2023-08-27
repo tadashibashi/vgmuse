@@ -15,7 +15,7 @@ interface Props extends ButtonProps {
 export default function LoadButton(p: Props) {
 
     return (
-          <ButtonPrimary type={p.type || "button"}
+          <ButtonPrimary type={p.type || "button"} className={p.className}
                   onClick={p.onClick}>
                       {p.isLoading && <SpinnerIcon className="me-2" bgClass="fill-violet-900" fgClass="fill-violet-200"/>} {p.isLoading ? p.loadingText || p.text : p.text}
           </ButtonPrimary>
