@@ -1,5 +1,4 @@
 import busboy, {FileInfo} from "busboy";
-import {UploadFile} from "../api/s3";
 import {InvalidRequestError} from "../lib/errors";
 
 /**

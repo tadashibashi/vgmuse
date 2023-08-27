@@ -1,4 +1,4 @@
-import {request, sendForm} from "./requests.ts";
+import {request, sendForm} from "./requests";
 
 const BASE_URL = "/api/vgm";
 
