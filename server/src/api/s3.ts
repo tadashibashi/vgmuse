@@ -1,20 +1,16 @@
 import {DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client,} from "@aws-sdk/client-s3";
 import {reqEnv} from "../lib/env";
-import {StreamingBlobPayloadInputTypes} from "@smithy/types";
-
-// ========== types ==========
-
-export type UploadFile = StreamingBlobPayloadInputTypes;
+import {Readable} from "stream";
 
 // ========== constants ==========
 
 const BUCKET = reqEnv("S3_BUCKET");
 
-
+export type UploadFileType = string | Uint8Array | Buffer | Readable | Blob;
 
 // ========== api ==========
 
-export async function uploadFile(key: string, body: UploadFile) {
+export async function uploadFile(key: string, body: UploadFileType) {
     const s3 = getS3Client();
 
     return await s3.send(new PutObjectCommand({

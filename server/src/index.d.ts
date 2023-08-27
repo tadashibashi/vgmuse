@@ -1,7 +1,5 @@
 import {NextFunction, Request as ExpressRequest, Response} from "express";
 import {Types} from "mongoose";
-import {UploadFile} from "./api/s3";
-
 
 
 declare global {
