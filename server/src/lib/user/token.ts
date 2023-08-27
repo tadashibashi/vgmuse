@@ -14,30 +14,42 @@ const FIFTEEN_MINS = 900_000;
 
 const SALT_ROUNDS = 8;
 
+const domain = DOMAIN === "localhost" ? undefined : DOMAIN;
+
+function makeCookie(name: string, val: string, maxAge: number|undefined, httpOnly: boolean, res: Response) {
+    if (domain) {
+        res.cookie(name, val, {
+            httpOnly,
+            maxAge,
+            sameSite: "strict",
+            secure: PRODUCTION,
+            domain: domain,
+        });
+    } else {
+        res.cookie(name, val, {
+            httpOnly,
+            maxAge,
+            sameSite: "strict",
+            secure: PRODUCTION,
+        });
+    }
+}
+
 // passes user token to the frontend cookie
 export function passUserToken(user: VGMuse.Frontend.User | VGMuse.IUser, rememberMe: boolean, req: Request, res: Response) {
+    // fingerprint to check if user token is valid
     let fingerprint = crypto.randomBytes(32).toString("hex");
 
     if (!rememberMe)
         res.clearCookie("user-refresh");
 
-    res.cookie("fingerprint", fingerprint, {
-        httpOnly: true,
-        maxAge: ONE_MONTH,
-        sameSite: "strict",
-        secure: PRODUCTION,
-        domain: DOMAIN,
-    });
+    makeCookie("fingerprint", fingerprint, ONE_MONTH, true, res);
+
 
     if (rememberMe && !req.cookies["user-refresh"]) {
+        // create the refresh token if it doesn't exist and rememberMe was checked
         const refreshToken = createToken({user: user._id}, "30d");
-        res.cookie("user-refresh", refreshToken, {
-            httpOnly: true,
-            maxAge: ONE_MONTH,
-            sameSite: "strict",
-            secure: PRODUCTION,
-            domain: DOMAIN,
-        });
+        makeCookie("user-refresh", refreshToken, ONE_MONTH, true, res);
     }
 
     const userToSend = {
@@ -49,16 +61,7 @@ export function passUserToken(user: VGMuse.Frontend.User | VGMuse.IUser, remembe
     };
 
     const token = createToken( {user: userToSend}, "15m");
-
-    res.cookie("user", token, {
-        // when remember-me login, save cookie for one month, otherwise, delete it after session
-        maxAge: ONE_DAY,
-        sameSite: "strict",
-
-        // on safari, this must be set to false on localhost, chrome permits dev use of secure
-        secure: PRODUCTION,
-        domain: DOMAIN,
-    });
+    makeCookie("user", token, ONE_DAY, false, res);
 
     return token;
 }
