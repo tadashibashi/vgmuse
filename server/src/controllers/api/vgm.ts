@@ -1,9 +1,19 @@
+import {uploadFile} from "../../api/s3";
+import {InvalidRequestError} from "../../lib/errors";
+
 /**
  * Create a VGM file
  * POST /api/vgm/
  */
-export const createOne = function(req, res, next) {
-    console.log(req.files);
+export const createOne = async function(req, res, next) {
+
+    if (!req.files) return next(new InvalidRequestError("Missing files"));
+
+    for (const [name, file] of Object.entries(req.files)) {
+        console.log(file.buffer);
+        await uploadFile(file.filename, file.buffer);
+    }
+
     return res.json(req.files);
 
 } as VGMuse.MiddlewareFunction;
