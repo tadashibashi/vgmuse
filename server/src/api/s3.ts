@@ -6,7 +6,7 @@ import {Readable} from "stream";
 
 const BUCKET = reqEnv("S3_BUCKET");
 
-export type UploadFileType = string | Uint8Array | Buffer | Readable | Blob;
+export type UploadFileType = string | Uint8Array | Buffer | Readable | Blob | ReadableStream;
 
 // ========== api ==========
 
