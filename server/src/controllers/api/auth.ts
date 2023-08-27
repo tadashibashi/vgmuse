@@ -67,31 +67,31 @@ export const activateAccount = async function(req, res, next) {
 
     const token = req.params["token"];
     if (!token)
-        return next(new InvalidRequestError("Parameter \"token\" was missing from request"));
+        return res.json(new InvalidRequestError("Parameter \"token\" was missing from request"));
     try {
         const payload = verifyToken(token);
         if (payload.error) {
             if (payload.error.name === "TokenExpiredError")
-                return next(new InvalidRequestError("Activation link expired"));
+                return res.json(new InvalidRequestError("Activation link expired"));
             else
-                return next(new InvalidRequestError("Invalid token"));
+                return res.json(new InvalidRequestError("Invalid token"));
         }
 
         if (!Is.userActivationToken(payload)) {
-            return next(new InvalidRequestError());
+            return res.json(new InvalidRequestError());
         }
 
         const user = await User.findOne({username: payload.user.name});
         if (!user) {
-            return next(new InvalidRequestError("User does not exist"));
+            return res.json(new InvalidRequestError("User does not exist"));
         }
 
         if (user.isValidated) {
-            return next(new InvalidRequestError("Your account has already been validated"))
+            return res.json(new InvalidRequestError("Your account has already been validated"))
         }
 
         if (!await hashCompare(user._id.toString(), payload.user.id))
-            return next(new InvalidRequestError("User identification error"));
+            return res.json(new InvalidRequestError("User identification error"));
 
         user.isValidated = true;
         await user.save();
@@ -100,11 +100,11 @@ export const activateAccount = async function(req, res, next) {
 
     } catch (e) {
         if (e instanceof jwt.JsonWebTokenError) {
-            return next(new InvalidRequestError("Your link contained an invalid token"));
+            return res.json(new InvalidRequestError("Your link contained an invalid token"));
         } else if (e instanceof jwt.TokenExpiredError) {
-            return next(new InvalidRequestError("Your link has expired"));
+            return res.json(new InvalidRequestError("Your link has expired"));
         } else {
-            return next(e);
+            return res.json(e);
         }
     }
 
