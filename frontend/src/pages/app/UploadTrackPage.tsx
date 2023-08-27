@@ -1,6 +1,9 @@
 import React, {RefObject, useRef, useState} from "react";
 import {CloudArrowUpIcon, MusicalNoteIcon} from "@heroicons/react/24/outline";
 import Form from "../../components/Form.tsx";
+import ButtonPrimary from "../../components/buttons/ButtonPrimary.tsx";
+import LoadButton from "../../components/buttons/LoadButton.tsx";
+import {FormErrors} from "../../lib/formValidation.ts";
 
 
 export default function() {
@@ -44,13 +47,18 @@ export default function() {
         setUploadFilename(evt.currentTarget.value);
     }
 
+    function onValidationError(e: FormErrors) {
+
+    }
+
 
     return (
         <div onDrop={e => e.preventDefault()}>
-        <Form action="api/vgm/create" shouldSubmit={() => false}>
+        <Form action="/api/vgm" method="POST" shouldSubmit={() => true} onValidationError={onValidationError} className="max-w-lg mx-auto">
 
+            {/*VGM Upload Panel*/}
             <div className="col-span-full">
-                <div className="mt-2 relative flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
+                <div className={"mt-2 relative flex justify-center rounded-lg  px-6 py-10 " + (uploadFilename ? "border-0" : "border border-dashed border-gray-900/25")}
                     onDragEnter={onDrag} onDragOver={onDrag}>
                     <div className="text-center">
                         {uploadFilename ? <MusicalNoteIcon className="mx-auto h-12 w-12 text-gray-300"  /> : <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-300" />}
@@ -73,8 +81,12 @@ export default function() {
                         isDragActive && <div className="absolute top-0 left-0 w-full h-full z-50 bg-gray-50 opacity-50 rounded-md" onDragEnter={onDrag} onDragOver={onDrag} onDragLeave={onDrag} onDrop={onDrop}></div>
                     }
                 </div>
-
             </div>
+
+            {/*Title*/}
+
+
+            <LoadButton className="mt-4" type="submit" isLoading={true} loadingText="Processing..." text="Upload" />
         </Form>
 
         </div>
