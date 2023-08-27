@@ -6,9 +6,27 @@ import {ServerError} from "../lib/errors";
 import injectUser from "../middleware/injectUser";
 import mongoose from "mongoose";
 import {PRODUCTION} from "../lib/jwt/constants";
+import helmet, {HelmetOptions} from "helmet";
+import {DOMAIN} from "../constants";
+
+// const contentSecurityPolicy: HelmetOptions = {
+//     useDefaults: true,
+//     directives: {
+//         "font-src": ["'self'"],
+//         "style-src": ["'self'"],
+//         "script-src": ["'self'"],
+//     },
+// };
+
+// if (DOMAIN !== "localhost") {
+//     contentSecurityPolicy.directives["upgrade-insecure-requests"] = true;
+// }
+//
 
 function config(server: Express) {
     server.use(morgan("dev"));
+    // server.use(helmet(contentSecurityPolicy,
+    // ));
     server.use(cookieParser());
     server.use(injectUser());
     server.use(express.json());
