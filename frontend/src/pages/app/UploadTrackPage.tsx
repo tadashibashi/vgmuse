@@ -4,7 +4,10 @@ import Form from "../../components/Form.tsx";
 import ButtonPrimary from "../../components/buttons/ButtonPrimary.tsx";
 import LoadButton from "../../components/buttons/LoadButton.tsx";
 import {FormErrors} from "../../lib/formValidation.ts";
+import {navigateService} from "../../services";
+import urls from "../../urls.tsx";
 
+const TIMEOUT_TIME = 10000; // 10 seconds
 
 export default function() {
     //@ts-ignore
@@ -12,6 +15,12 @@ export default function() {
 
     const [isDragActive, setIsDragActive] = useState(false);
     const [uploadFilename, setUploadFilename] = useState("");
+
+    const [isSendingForm, setIsSendingForm] = useState(false);
+
+    const [errors, setErrors] = useState<string[]>([]);
+
+    const [uploadTimeout, setUploadTimeout] = useState<NodeJS.Timeout | null>(null);
 
     function onDragEnter(evt: React.DragEvent) {
         if (evt.target === evt.currentTarget)
@@ -43,18 +52,32 @@ export default function() {
         setIsDragActive(false);
     }
 
-    async function onChange(evt: React.FormEvent<HTMLInputElement>) {
+    function onChange(evt: React.FormEvent<HTMLInputElement>) {
         setUploadFilename(evt.currentTarget.value);
     }
 
+
+
+
     function onValidationError(e: FormErrors) {
 
+        setIsSendingForm(false);
+    }
+
+    function onShouldSubmit(data: any) {
+        setIsSendingForm(true);
+        return true;
+    }
+
+    function onSuccess() {
+        setIsSendingForm(false);
+        navigateService.get()(urls.app.myTracks.path);
     }
 
 
     return (
         <div onDrop={e => e.preventDefault()}>
-        <Form action="/api/vgm" method="POST" shouldSubmit={() => true} onValidationError={onValidationError} className="max-w-lg mx-auto">
+        <Form action="/api/vgm" method="POST" shouldSubmit={onShouldSubmit} onValidationError={onValidationError} onSuccess={onSuccess} className="max-w-lg mx-auto">
 
             {/*VGM Upload Panel*/}
             <div className="col-span-full">
@@ -86,7 +109,7 @@ export default function() {
             {/*Title*/}
 
 
-            <LoadButton className="mt-4" type="submit" isLoading={true} loadingText="Processing..." text="Upload" />
+            <LoadButton className="mt-4" type="submit" isLoading={isSendingForm} loadingText="Processing..." text="Upload" />
         </Form>
 
         </div>
