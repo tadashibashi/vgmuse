@@ -34,7 +34,7 @@ const userSchema = new Schema<VGMuse.IUser>({
             },
             // is unique email address?
             {
-                validator: enforceUnique<VGMuse.IUser, string>("email"),
+                validator: enforceUnique<VGMuse.IUser>("email"),
                 message: "An account with your email address already exists"
             }
         ]
