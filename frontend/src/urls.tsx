@@ -41,8 +41,11 @@ export const urls = {
             page: <h1>Explore</h1>,
         },
         myTracks: {
-            path: "/app/my-tracks",
+            path: "/app/tracks",
             page: <h1>My Tracks</h1>,
+        },
+        oneTrack: {
+            path: "/app/tracks/:user/:slug"
         },
         uploadTrack: {
             path: "/app/upload-track",
