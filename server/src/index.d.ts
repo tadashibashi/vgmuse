@@ -10,7 +10,7 @@ declare global {
         }
 
         interface FileData {
-            file: NodeJS.ReadableStream;
+            buffer: Buffer;
             filename: string;
             mimetype: string;
             encoding: string;
