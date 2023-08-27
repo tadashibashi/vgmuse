@@ -10,7 +10,7 @@ import {Transition} from "@headlessui/react";
 import {EnvelopeIcon, LockClosedIcon} from "@heroicons/react/24/outline";
 import LoadButton from "../../components/buttons/LoadButton.tsx";
 import debounce from "../../lib/debounce.ts";
-import {refreshUser} from "../../api/auth.ts";
+import {refreshUser, resendVerificationEmail} from "../../api/auth.ts";
 
 export default function LogInPage() {
     const [errors, setErrors] = useState<string[]>([]);
@@ -36,10 +36,22 @@ export default function LogInPage() {
         setSending(false);
     }
 
-    function onSuccess(data: unknown) {
+    async function onSuccess(data: unknown) {
+        function isUser(user: any): user is {isValidated: boolean} {
+            return user && typeof user.isValidated === "boolean";
+        }
+
         setSending(false);
         setShowErrors(false);
-        console.log(data);
+
+        if (isUser(data)) {
+            if (!data.isValidated) {
+                await resendVerificationEmail();
+                return navigate(urls.auth.validationEmailSent.path);
+            }
+        }
+
+
         navigate(urls.root.app.path);
     }
 
