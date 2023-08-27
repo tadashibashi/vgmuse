@@ -6,6 +6,7 @@ import ValidationEmailSentPage from "./pages/auth/ValidationEmailSentPage.tsx";
 import AuthPages from "./pages/auth/AuthPages.tsx";
 import ValidationReceivedPage from "./pages/auth/ValidationReceivedPage.tsx";
 import AppPages from "./pages/app/AppPages.tsx";
+import UploadTrackPage from "./pages/app/UploadTrackPage.tsx";
 
 export type URLDirectory = Record<string, URLInfo>;
 
@@ -28,6 +29,29 @@ export const urls = {
             path: "/app/*",
             page: <AppPages />
         } as URLInfo,
+    },
+
+    app: {
+        index: {
+            path: "/app",
+            page: <AppPages />
+        },
+        explore: {
+            path: "/app/explore",
+            page: <h1>Explore</h1>,
+        },
+        myTracks: {
+            path: "/app/my-tracks",
+            page: <h1>My Tracks</h1>,
+        },
+        uploadTrack: {
+            path: "/app/upload-track",
+            page: <UploadTrackPage />,
+        },
+        stats: {
+            path: "/app/stats",
+            page: <></>,
+        },
     },
 
     auth: {
