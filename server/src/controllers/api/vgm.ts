@@ -6,17 +6,17 @@ import {InvalidRequestError} from "../../lib/errors";
  * POST /api/vgm/
  */
 export const createOne = async function(req, res, next) {
+    if (!req.files) return next(new InvalidRequestError("missing files"));
 
-    if (!req.files) return next(new InvalidRequestError("Missing files"));
-
-    for (const [name, file] of Object.entries(req.files)) {
-        console.log(file.buffer);
+    const file = req.files["file-upload"];
+    if (file && file.buffer.length) {
         await uploadFile(file.filename, file.buffer);
     }
 
     return res.json(req.files);
 
 } as VGMuse.MiddlewareFunction;
+
 
 /**
  * Search for VGM files
