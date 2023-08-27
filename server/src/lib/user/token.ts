@@ -16,7 +16,7 @@ const SALT_ROUNDS = 8;
 
 const domain = DOMAIN === "localhost" ? undefined : DOMAIN;
 
-function makeCookie(name: string, val: string, maxAge: number|undefined, httpOnly: boolean, res: Response) {
+function createCookie(name: string, val: string, maxAge: number|undefined, httpOnly: boolean, res: Response) {
     if (domain) {
         res.cookie(name, val, {
             httpOnly,
@@ -43,13 +43,12 @@ export function passUserToken(user: VGMuse.Frontend.User | VGMuse.IUser, remembe
     if (!rememberMe)
         res.clearCookie("user-refresh");
 
-    makeCookie("fingerprint", fingerprint, ONE_MONTH, true, res);
+    createCookie("fingerprint", fingerprint, ONE_MONTH, true, res);
 
-
-    if (rememberMe && !req.cookies["user-refresh"]) {
+    if (!req.cookies["user-refresh"]) {
         // create the refresh token if it doesn't exist and rememberMe was checked
         const refreshToken = createToken({user: user._id}, "30d");
-        makeCookie("user-refresh", refreshToken, ONE_MONTH, true, res);
+        createCookie("user-refresh", refreshToken, rememberMe ? ONE_MONTH : undefined, true, res);
     }
 
     const userToSend = {
@@ -61,7 +60,7 @@ export function passUserToken(user: VGMuse.Frontend.User | VGMuse.IUser, remembe
     };
 
     const token = createToken( {user: userToSend}, "15m");
-    makeCookie("user", token, ONE_DAY, false, res);
+    createCookie("user", token, rememberMe ? ONE_DAY : undefined, false, res);
 
     return token;
 }
