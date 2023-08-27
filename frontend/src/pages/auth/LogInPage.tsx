@@ -52,7 +52,7 @@ export default function LogInPage() {
         }
 
 
-        navigate(urls.root.app.path);
+        navigate(urls.app.explore.path);
     }
 
     function shouldSubmit() {
