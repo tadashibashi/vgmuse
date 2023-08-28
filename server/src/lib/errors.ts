@@ -65,7 +65,10 @@ export class FormError extends ServerError {
 
     pushError(fieldName: string, error: Error | IError | string) {
         if (typeof error === "string") {
-
+            this.errors[fieldName] = {
+                name: "FormError",
+                message: error,
+            };
         } else {
             this.errors[fieldName] = {
                 name: error.name,
