@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/:username/:slug", vgmCtrl.readOne);
 router.delete("/:username/:slug", loginRequired(), vgmCtrl.deleteOne);
-router.post("/", formParser.files(), loginRequired(), vgmCtrl.createOne);
-router.patch("/:username/:slug", loginRequired(), vgmCtrl.updateOne);
+router.post("/", loginRequired(), formParser.files({limits: {fileSize: 2000000}}), vgmCtrl.createOne);
+router.patch("/:username/:slug", loginRequired(), formParser.files(), vgmCtrl.updateOne);
 
 export default router;
