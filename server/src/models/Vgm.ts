@@ -41,13 +41,6 @@ vgmSchema.pre("save", async function() {
      if (!this.slug) {
          this.slug = slugify(this.title);
      }
-
-     if (!this.fileKey) {
-         const user = await User.findById(this.user);
-         if (!user)
-             throw new Error.ValidationError();
-         this.fileKey = `users/${user.username}`;
-     }
 });
 
 export default model("Vgm", vgmSchema);
