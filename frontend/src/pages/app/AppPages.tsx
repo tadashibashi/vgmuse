@@ -1,4 +1,4 @@
-import {Fragment, useEffect, useState} from 'react'
+import React, {Fragment, useEffect, useState} from 'react'
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import {
     Bars3Icon,
@@ -22,6 +22,7 @@ import {Link, Route, useLocation} from "react-router-dom";
 import {navigateService} from "../../services";
 import {getSubpaths} from "../../lib/paths.ts";
 import {Routes} from "../../components/Routes";
+import MusicPlayer from "../../components/MusicPlayer.tsx";
 
 const userNavbar = [
     { name: "Explore", href: "/app/explore", icon: GlobeEuropeAfricaIcon, current: true },
@@ -112,7 +113,7 @@ export default function AppPages() {
                                                         <item.icon
                                                             className={classNames(
                                                                 location.pathname.startsWith(item.href) ? 'text-violet-600' : 'text-gray-400 group-hover:text-violet-600',
-                                                                'w-auto shrink-0'
+                                                                'h-10 shrink-0 p-1 mx-auto'
                                                             )}
                                                             aria-hidden="true"
                                                         />
@@ -228,26 +229,27 @@ export default function AppPages() {
                     </div>
                 </div>
 
-                <div className="pl-[84px] lg:pl-48">
-                    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+                <div className="pl-[100px] lg:pl-48">
+                    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-6 shadow-sm sm:gap-x-6 lg:px-8">
 
                         <div className="flex flex-1 gap-x-4 self-stretch">
-                            <Form shouldSubmit={() => false} className="relative flex flex-1" action={urls.app.explore.path} method="GET">
-                                <label htmlFor="search-field" className="sr-only">
-                                    Search
-                                </label>
-                                <MagnifyingGlassIcon
-                                    className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400"
-                                    aria-hidden="true"
-                                />
-                                <input
-                                    id="search-field"
-                                    className="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
-                                    placeholder="Search..."
-                                    type="search"
-                                    name="search"
-                                />
-                            </Form>
+                            {/*<Form shouldSubmit={() => false} className="relative flex flex-1" action={urls.app.explore.path} method="GET">*/}
+                            {/*    <label htmlFor="search-field" className="sr-only">*/}
+                            {/*        Search*/}
+                            {/*    </label>*/}
+                            {/*    <MagnifyingGlassIcon*/}
+                            {/*        className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400"*/}
+                            {/*        aria-hidden="true"*/}
+                            {/*    />*/}
+                            {/*    <input*/}
+                            {/*        id="search-field"*/}
+                            {/*        className="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm lg:text-md"*/}
+                            {/*        placeholder="Search..."*/}
+                            {/*        type="search"*/}
+                            {/*        name="search"*/}
+                            {/*    />*/}
+                            {/*</Form>*/}
+                            <MusicPlayer />
                             <div className="flex items-center gap-x-4 lg:gap-x-6">
                                 <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
                                     <span className="sr-only">View notifications</span>
