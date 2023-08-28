@@ -1,5 +1,8 @@
-import {Schema, model} from "mongoose";
+import {Schema, model, Error} from "mongoose";
 import {enforceUnique} from "../lib/models/validation";
+import slugify from "slugify";
+import User from "./User";
+
 
 const vgmSchema = new Schema<VGMuse.IVgm>({
     title: {
@@ -17,12 +20,12 @@ const vgmSchema = new Schema<VGMuse.IVgm>({
     },
     fileKey: String,
     slug: {
-        required: true,
         type: String,
         validate: {
             validator: enforceUnique<VGMuse.IVgm>("slug", ["user"]),
             message: "A VGM you uploaded already has this url",
         },
+        default: "",
     },
     isPublished: {
         type: Boolean,
@@ -31,6 +34,20 @@ const vgmSchema = new Schema<VGMuse.IVgm>({
     },
 }, {
     timestamps: true,
+});
+
+vgmSchema.pre("save", async function() {
+    // if no slug, slugify the title
+     if (!this.slug) {
+         this.slug = slugify(this.title);
+     }
+
+     if (!this.fileKey) {
+         const user = await User.findById(this.user);
+         if (!user)
+             throw new Error.ValidationError();
+         this.fileKey = `users/${user.username}`;
+     }
 });
 
 export default model("Vgm", vgmSchema);
