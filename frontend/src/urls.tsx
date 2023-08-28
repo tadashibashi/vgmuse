@@ -45,7 +45,8 @@ export const urls = {
             page: <h1>My Tracks</h1>,
         },
         oneTrack: {
-            path: "/app/tracks/:user/:slug"
+            path: "/app/tracks/:user/:slug",
+            page: <h1>Track</h1>
         },
         uploadTrack: {
             path: "/app/upload-track",

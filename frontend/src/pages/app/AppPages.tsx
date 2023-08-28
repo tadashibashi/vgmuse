@@ -25,7 +25,7 @@ import {Routes} from "../../components/Routes";
 
 const userNavbar = [
     { name: "Explore", href: "/app/explore", icon: GlobeEuropeAfricaIcon, current: true },
-    { name: "Muse Files", href: "/app/my-tracks", icon: MusicalNoteIcon, current: false },
+    { name: "Muse Files", href: "/app/tracks", icon: MusicalNoteIcon, current: false },
     { name: "Upload", href: "/app/upload-track", icon: ArrowUpOnSquareStackIcon, current: false }
     // { name: 'Store', href: '#', icon: ShoppingCartIcon, current: false },
     // { name: 'Scripts', href: '#', icon: CodeBracketIcon, current: false },
