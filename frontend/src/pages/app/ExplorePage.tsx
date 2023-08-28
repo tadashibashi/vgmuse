@@ -20,8 +20,8 @@ export default () => {
                                 type="text"
                                 name="search"
                                 id="account-number"
-                                className="block w-full rounded-md border-0 ps-2 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-400 sm:text-sm sm:leading-6"
-                                placeholder="Search..."
+                                className="block w-full rounded-md border-0 ps-3 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-400 sm:text-sm sm:leading-6"
+                                placeholder="Search"
                             />
                             <button type="submit" className="absolute inset-y-0 right-0 flex items-center pr-3 z-100" onClick={(e) => e.stopPropagation()}>
                                 <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
