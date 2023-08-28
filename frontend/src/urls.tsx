@@ -7,6 +7,8 @@ import AuthPages from "./pages/auth/AuthPages.tsx";
 import ValidationReceivedPage from "./pages/auth/ValidationReceivedPage.tsx";
 import AppPages from "./pages/app/AppPages.tsx";
 import UploadTrackPage from "./pages/app/UploadTrackPage.tsx";
+import ExplorePage from "./pages/app/ExplorePage.tsx";
+import MuseFilesPage from "./pages/app/MuseFilesPage.tsx";
 
 export type URLDirectory = Record<string, URLInfo>;
 
@@ -38,11 +40,11 @@ export const urls = {
         },
         explore: {
             path: "/app/explore",
-            page: <h1>Explore</h1>,
+            page: <ExplorePage />,
         },
         myTracks: {
             path: "/app/tracks",
-            page: <h1>My Tracks</h1>,
+            page: <MuseFilesPage />,
         },
         oneTrack: {
             path: "/app/tracks/:user/:slug",
