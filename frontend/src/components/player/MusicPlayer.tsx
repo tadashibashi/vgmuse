@@ -1,4 +1,4 @@
-import PlayerControls from "./player/PlayerControls.tsx";
+import PlayerControls from "./PlayerControls.tsx";
 
 import {useState} from "react";
 

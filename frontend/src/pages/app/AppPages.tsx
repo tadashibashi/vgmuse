@@ -22,7 +22,7 @@ import {Link, Route, useLocation} from "react-router-dom";
 import {navigateService} from "../../services";
 import {getSubpaths} from "../../lib/paths.ts";
 import {Routes} from "../../components/Routes";
-import MusicPlayer from "../../components/MusicPlayer.tsx";
+import MusicPlayer from "../../components/player/MusicPlayer.tsx";
 
 const userNavbar = [
     { name: "Explore", href: "/app/explore", icon: GlobeEuropeAfricaIcon, current: true },
