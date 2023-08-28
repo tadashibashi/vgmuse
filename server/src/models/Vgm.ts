@@ -7,7 +7,7 @@ import User from "./User";
 const vgmSchema = new Schema<VGMuse.IVgm>({
     title: {
         type: String,
-        required: true,
+        required: [true, "Missing title"],
         validate: {
             validator: enforceUnique<VGMuse.IVgm>("title", ["user"]),
             message: "A VGM you uploaded already has this title",
@@ -30,7 +30,7 @@ const vgmSchema = new Schema<VGMuse.IVgm>({
     isPublished: {
         type: Boolean,
         required: false,
-        default: false,
+        default: true,
     },
 }, {
     timestamps: true,
