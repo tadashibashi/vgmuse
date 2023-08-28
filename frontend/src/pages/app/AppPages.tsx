@@ -49,9 +49,10 @@ function classNames(...classes: string[]) {
 
 export default function AppPages() {
     const location = useLocation();
-    const [sidebarOpen, setSidebarOpen] = useState(false)
     const [user, setUser] = useState<VGMuse.Frontend.User | null>(null);
 
+    // Pages subpaths used in routes. Using state
+    // since it gives a callback that should only be called once on component load
     const [pages, setPages] = useState<URLDirectory>(() => getSubpaths(urls.app));
 
     const navbar = user ? userNavbar : guestNavbar;
@@ -68,8 +69,8 @@ export default function AppPages() {
     ];
 
     const guestNavigation = [
-        { name: "Log in", href: urls.auth.userLogin.path + "?last-page=" + urls.root.app.path },
-        { name: "Register", href: urls.auth.userSignUp.path + "?last-page=" + urls.root.app.path },
+        { name: "Log in", href: urls.auth.userLogin.path + "?last-page=" + location.pathname },
+        { name: "Register", href: urls.auth.userSignUp.path + "?last-page=" + location.pathname },
     ];
 
     const userNavigation = user ? loggedInNavigation : guestNavigation;
