@@ -4,20 +4,28 @@ import {enforceUnique} from "../lib/models/validation";
 const Schema = mongoose.Schema;
 
 const emailValidator = /^[\w-.]+@([\w-]+\.)+[\w-]{2,6}$/;
+const usernameValidator = /^[\w-]+$/;
 
 const userSchema = new Schema<VGMuse.IUser>({
     username: {
         type: String,
         required: [true, "username is missing"],
+        minLength: [3, "Username must be at least 3 characters long"],
         unique: true,
-        validate: {
-            validator: async function(this: HydratedDocument<VGMuse.IUser>, v: string) {
-                const ctor = this.constructor as mongoose.Model<any>;
-                const models = await ctor.find({username: v});
-                return models.length === 0 || models[0]._id.equals(this._id);
+        validate: [
+            {
+                validator: async function(this: HydratedDocument<VGMuse.IUser>, v: string) {
+                    const ctor = this.constructor as mongoose.Model<any>;
+                    const models = await ctor.find({username: v});
+                    return models.length === 0 || models[0]._id.equals(this._id);
+                },
+                message: "This username has already been taken",
             },
-            message: "This username has already been taken",
-        },
+            {
+                validator: function (v: string) { return usernameValidator.test(v); },
+                message: "Username must consist only of letters, numbers, underscores, and dashes",
+            },
+        ],
     },
 
     email: {
@@ -86,11 +94,19 @@ const userSchema = new Schema<VGMuse.IUser>({
 
 // ===== Middleware ===========================================================
 
+// pre-format values before validation
+userSchema.pre("validate", function(next) {
+    if (this.isModified("username"))
+        this.username = this.username.trim();
+    return next();
+});
+
 userSchema.pre("save", async function(next) {
     if (!this.isModified("password"))
         return next();
     this.password = await hash(this.password);
 });
+
 
 
 // ===== Getters / Setters ====================================================
