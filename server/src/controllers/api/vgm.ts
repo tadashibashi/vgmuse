@@ -1,8 +1,7 @@
 import {uploadFile} from "../../api/s3";
-import {createFormErrors, FormError, InternalError, InvalidRequestError} from "../../lib/errors";
+import {FormError, InternalError} from "../../lib/errors";
 import Vgm from "../../models/Vgm";
 import mongoose, {HydratedDocument} from "mongoose";
-import slugify from "slugify";
 import path from "path";
 
 /**
@@ -38,22 +37,38 @@ export const createOne = async function(req, res, next) {
     if (!file || !file.buffer.length) {
         const error = new FormError();
         error.pushError("file-upload", "Missing file upload");
+        await vgm.deleteOne();
         return res.json(error);
     }
 
     if (!file.filename) {
         const error = new FormError();
         error.pushError("file-upload", "Missing filename");
+        await vgm.deleteOne();
         return res.json(error);
     }
 
     // construct folder path
     const folder = `/users/${user._id}/vgm/${vgm._id}/`;
     const vgmFilename = `${vgm.slug}${path.extname(file.filename)}`;
+    const fileKey = folder + vgmFilename;
 
-    // TODO: scan file for vgm validity
+    // TODO: scan file on frontend for vgm validity
 
-    await uploadFile(folder + vgmFilename, file.buffer);
+    try {
+        await uploadFile(folder + vgmFilename, file.buffer);
+        vgm.fileKey = fileKey;
+        await vgm.save();
+    } catch(e) {
+        const error = new FormError();
+        if (e instanceof Error)
+            error.pushError("file-upload", e.message);
+        else
+            error.pushError("file-upload", "failed to upload file");
+
+        await vgm.deleteOne();
+        return res.json(error);
+    }
 
     return res.json(vgm);
 
