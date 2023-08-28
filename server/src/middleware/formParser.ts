@@ -45,26 +45,46 @@ export const files = function(opts?: FilesOpts) {
         const body: Record<string, string | busboy.Info> = {};
 
         try {
-            const bb = busboy({headers: req.headers, limits: opts?.limits});
+            const bb = busboy({headers: req.headers});
+            const fileSizeLimit = opts?.limits?.fileSize ? opts.limits.fileSize : Infinity;
+            const filesLimit = opts?.limits?.files ? opts.limits.files : Infinity;
+            const fieldsLimit = opts?.limits?.fields ? opts.limits.fields : Infinity;
+
+            let fileCount = 0;
+            let fieldsCount = 0;
 
             // error helper, stops upload process, sends error to client-side
             // make sure all messages contain client-presentable messages.
             async function throwError<T extends Error>(error: T) {
                 req.unpipe(bb);
-                return res.json(error);
+                return res.json({errors: {error}});
             }
 
             // non-file field listener
             bb.on("field", (name, value) => {
+                if (++fieldsCount > fieldsLimit)
+                    return throwError(new InvalidRequestError("Fields limit exceeded"));
                 body[name] = value;
             });
 
             // file field listener
             bb.on("file", (name, fileStrm, info) => {
+                if (++fileCount > filesLimit)
+                    return throwError(new InvalidRequestError("Files limit exceed"));
 
                 // collect chunks of file data
-                const chunks: Array<Uint8Array> = [];
-                fileStrm.on("data", chunk => chunks.push(chunk));
+                let byteCount = 0;
+                let chunks: Array<Uint8Array> = [];
+
+                fileStrm.on("data", (chunk: Uint8Array) => {
+                    chunks.push(chunk);
+                    byteCount += chunk.byteLength;
+
+                    if (byteCount > fileSizeLimit) {
+                        chunks = [];
+                        return throwError(new InvalidRequestError("File is too large –– limit exceeded"));
+                    }
+                });
 
                 // save chunks and info into files object
                 fileStrm.on("close", () => {
@@ -75,16 +95,6 @@ export const files = function(opts?: FilesOpts) {
                         encoding: info.encoding,
                     };
                 });
-            });
-
-            // when too many files
-            bb.on("filesLimit", () => {
-                return throwError(new InvalidRequestError("Files limit exceeded"));
-            });
-
-            // when too many fields
-            bb.on("fieldsLimit", () => {
-                return throwError(new InvalidRequestError("Fields limit exceeded"));
             });
 
             // when finished processing
