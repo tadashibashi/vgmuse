@@ -1,5 +1,6 @@
 interface IError {
-
+    message: string;
+    name: string;
 }
 
 export function createFormErrors(errors: VGMuse.IFormError | VGMuse.IFormError[]): VGMuse.IFormErrors {
@@ -16,6 +17,9 @@ export function createFormErrors(errors: VGMuse.IFormError | VGMuse.IFormError[]
 }
 
 
+
+
+
 export class ServerError extends Error {
     statusCode: number;
 
@@ -23,6 +27,13 @@ export class ServerError extends Error {
         super();
         this.message = message || "";
         this.statusCode = statusCode;
+    }
+}
+
+export class InternalError extends ServerError {
+    constructor(message?: string) {
+        super(500, message || "internal error");
+        this.name = "Internal Error";
     }
 }
 
@@ -38,11 +49,29 @@ export class InvalidRequestError extends ServerError {
 }
 
 export class FormError extends ServerError {
-    field: string;
+    errors: Record<string, IError>;
 
-    constructor(field: string, message?: string) {
-        super(400, message || "form error");
-        this.field = field;
+    /**
+     * Put 400 for user error, 500 for any server error
+     */
+    constructor(errOrCode: number | ServerError = 400) {
+        if (typeof errOrCode === "number")
+            super(errOrCode, "form error");
+        else
+            super(errOrCode.statusCode, errOrCode.message);
+
+        this.errors = {};
+    }
+
+    pushError(fieldName: string, error: Error | IError | string) {
+        if (typeof error === "string") {
+
+        } else {
+            this.errors[fieldName] = {
+                name: error.name,
+                message: error.message,
+            };
+        }
     }
 }
 
