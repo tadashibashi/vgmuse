@@ -31,11 +31,11 @@ namespace vgmuse {
          * @param data - data pointer
          * @param size - size of data in bytes
          */
-        error_t loadMem(const void *data, long size);
+        error_t load_mem(const void *data, long size);
         void unload();
-        void startTrack(int track);
+        error_t start_track(int track);
 
-        [[nodiscoard]]
+        [[nodiscard]]
         int trackCount() const;
 
         void stop();

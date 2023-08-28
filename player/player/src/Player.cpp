@@ -45,13 +45,16 @@ namespace vgmuse {
         m->audio.stop();
     }
 
-    void Player::startTrack(int track)
+    error_t Player::start_track(int track)
     {
         if (m->emu)
         {
-            gme_start_track(m->emu, track);
+            ERR_CHECK(gme_start_track(m->emu, track));
             m->audio.start();
+            return SUCCESS;
         }
+        else
+            return "Emu is not loaded";
     }
 
     error_t Player::load(const char *file)
@@ -59,17 +62,19 @@ namespace vgmuse {
         Music_Emu *emu = nullptr;
         ERR_CHECK(gme_open_file(file, &emu, m->audio.sampleRate()));
 
+        if (m->emu)
+            gme_delete(m->emu);
         m->emu = emu;
 
         return SUCCESS;
     }
 
-    error_t Player::loadMem(const void *data, long size)
+    error_t Player::load_mem(const void *data, long size)
     {
         Music_Emu *emu = nullptr;
         ERR_CHECK(gme_open_data(data, size, &emu, m->audio.sampleRate()));
-         
-
+        if (m->emu)
+            gme_delete(m->emu);
         m->emu = emu;
 
         return SUCCESS;
