@@ -6,6 +6,8 @@ import LoadButton from "../../components/buttons/LoadButton.tsx";
 import {FormErrors} from "../../lib/formValidation.ts";
 import {navigateService} from "../../services";
 import urls from "../../urls.tsx";
+import {Transition} from "@headlessui/react";
+import Alert from "../../components/Alert.tsx";
 
 const TIMEOUT_TIME = 10000; // 10 seconds
 
@@ -19,6 +21,7 @@ export default function() {
     const [isSendingForm, setIsSendingForm] = useState(false);
 
     const [errors, setErrors] = useState<string[]>([]);
+    const [showErrors, setShowErrors] = useState<boolean>(false);
 
     const [uploadTimeout, setUploadTimeout] = useState<NodeJS.Timeout | null>(null);
 
@@ -60,23 +63,44 @@ export default function() {
 
 
     function onValidationError(e: FormErrors) {
-
         setIsSendingForm(false);
+        setErrors(Object.values(e).map(e => e.message));
+        setShowErrors(true);
     }
 
     function onShouldSubmit(data: any) {
         setIsSendingForm(true);
+        setShowErrors(false);
         return true;
     }
 
-    function onSuccess() {
+    function onSuccess(obj: unknown) {
+        console.log(obj);
         setIsSendingForm(false);
+        setShowErrors(false);
         navigateService.get()(urls.app.myTracks.path);
     }
 
 
     return (
         <div onDrop={e => e.preventDefault()}>
+        <Transition show={showErrors}
+                    enter="transition-all ease-in-out duration-150"
+                    enterFrom="opacity-0 scale-0 max-h-0"
+                    enterTo="opacity-100 scale-100 max-h-full"
+                    leave="transition-all ease-in-out duration-300"
+                    leaveFrom="opacity-100 max-h-full scale-100"
+                    leaveTo="opacity-0 max-h-0 scale-0"
+        >
+            <Alert type="error"
+                   title={errors.length > 1 ? `There were ${errors.length} errors with your submission` : `There was an error with your submission`}
+                   className="mb-6"
+                   setIsVisible={(value) => {setShowErrors(value);}}>
+                <ul role="list" className="text-sm list-disc space-y-1 pl-5">
+                    {errors.map((error, i) => <li key={"error-" + i}>{error}</li>)}
+                </ul>
+            </Alert>
+        </Transition>
         <Form action="/api/vgm" method="POST" shouldSubmit={onShouldSubmit} onValidationError={onValidationError} onSuccess={onSuccess} className="max-w-lg mx-auto">
 
             {/*VGM Upload Panel*/}
