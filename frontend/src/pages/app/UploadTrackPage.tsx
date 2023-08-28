@@ -8,7 +8,6 @@ import {Transition} from "@headlessui/react";
 import Alert from "../../components/Alert.tsx";
 import VGMDropZone from "../../components/inputs/VGMDropZone.tsx";
 
-const TIMEOUT_TIME = 10000; // 10 seconds
 
 export default function() {
 
@@ -56,7 +55,7 @@ export default function() {
                     leaveTo="opacity-0 max-h-0 scale-0"
         >
             <Alert type="error"
-                   title={errors.length > 1 ? `There were ${errors.length} errors with your submission` : `There was an error with your submission`}
+                   title={errors.length > 1 ? `There were ${errors.length} errors on submitting your file` : `There was an error on submitting your file`}
                    className="mb-6"
                    setIsVisible={(value) => {setShowErrors(value);}}>
                 <ul role="list" className="text-sm list-disc space-y-1 pl-5">
