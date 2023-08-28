@@ -10,15 +10,37 @@ namespace vgmuse {
         Player();
         ~Player();
 
+        /**
+         * Initialize the player, which manages its own audio device.
+         * Perhaps decouple this for multiple players....
+         * @param sampleRate - in Hz
+         * @param device - name of the device or nullptr to get reasonable default
+         */
         error_t init(int sampleRate=44100, const char *device=nullptr);
 
+        /**
+         * Load the vgm file via filename
+         * All files should be preloaded in Emscripten
+         * @param file
+         * @return
+         */
         error_t load(const char *file);
-        error_t loadData(const void *data, long size);
+
+        /**
+         * Load file from memory
+         * @param data - data pointer
+         * @param size - size of data in bytes
+         */
+        error_t loadMem(const void *data, long size);
         void unload();
         void startTrack(int track);
+
+        [[nodiscoard]]
+        int trackCount() const;
+
         void stop();
     private:
-        friend void fillBuffer(void *data, short *out, int count);
+        friend void fillOutBuffer(void *data, short *out, int count);
         struct Impl;
         Impl *m;
     };

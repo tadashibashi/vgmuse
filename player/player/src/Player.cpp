@@ -15,31 +15,30 @@ namespace vgmuse {
                 gme_delete(emu);
         }
 
-        // shared ptr, don't delete
-        AudioDevice *audio;
+        // borrowed ptr
+        AudioDevice audio;
 
         Music_Emu *emu;
     };
 
-    void fillBuffer(void *data, short *out, int count)
+    void fillOutBuffer(void *data, short *out, int count)
     {
         auto m = static_cast<Player::Impl *>(data);
         if (m->emu)
             gme_play(m->emu, count, out);
     }
 
-    Player::Player(AudioDevice *device): m(new Impl)
+    Player::Player(): m(new Impl)
     {
-        m->audio = device;
+
     }
 
     Player::~Player() { delete m; }
 
     const char *Player::init(int sampleRate, const char *device)
     {
-         return m->audio.open(device, false, sampleRate, 512, fillBuffer, this->m);
+         return m->audio.open(device, false, sampleRate, 512, fillOutBuffer, this->m);
     }
-
 
     void Player::stop()
     {

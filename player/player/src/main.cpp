@@ -15,7 +15,7 @@ extern "C" {
 
 extern "C" {
 void load_data(void *data, long size) {
-    player.loadData(data, size);
+    player.loadMem(data, size);
     player.startTrack(0);
 }
 }
