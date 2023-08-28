@@ -60,5 +60,21 @@ declare global {
             isPublished: boolean;
         }
 
+        interface IFormErrors {
+            errors: Record<string, IFormError>;
+        }
+
+        interface IError {
+            message: string;
+            name: string;
+        }
+
+        interface IFormError extends IError {
+            field: string;
+        }
+
+        interface IServerError extends IError {
+            statusCode: number;
+        }
     }
 }

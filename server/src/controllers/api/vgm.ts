@@ -1,5 +1,5 @@
 import {uploadFile} from "../../api/s3";
-import {InvalidRequestError} from "../../lib/errors";
+import {createFormErrors, FormError, InvalidRequestError} from "../../lib/errors";
 
 /**
  * Create a VGM file
@@ -11,6 +11,8 @@ export const createOne = async function(req, res, next) {
     const file = req.files["file-upload"];
     if (file && file.buffer.length) {
         await uploadFile(file.filename, file.buffer);
+    } else {
+        return res.json(createFormErrors(new FormError("file-upload", "Missing file upload")));
     }
 
     return res.json(req.files);

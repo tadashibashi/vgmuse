@@ -1,9 +1,27 @@
+interface IError {
+
+}
+
+export function createFormErrors(errors: VGMuse.IFormError | VGMuse.IFormError[]): VGMuse.IFormErrors {
+    const e: VGMuse.IFormErrors = { errors: {} };
+    if (Array.isArray(errors)) {
+        errors.forEach(error => {
+            e.errors[error.field] = error;
+        });
+    } else {
+        e.errors[errors.field] = errors;
+    }
+
+    return e;
+}
+
 
 export class ServerError extends Error {
     statusCode: number;
 
     constructor(statusCode: number, message?: string) {
-        super(message);
+        super();
+        this.message = message || "";
         this.statusCode = statusCode;
     }
 }
@@ -16,6 +34,15 @@ export class InvalidRequestError extends ServerError {
     constructor(message?: string) {
         super(400, message || "invalid request");
         this.name = "InvalidRequestError";
+    }
+}
+
+export class FormError extends ServerError {
+    field: string;
+
+    constructor(field: string, message?: string) {
+        super(400, message || "form error");
+        this.field = field;
     }
 }
 
