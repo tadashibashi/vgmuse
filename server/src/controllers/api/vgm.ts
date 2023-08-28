@@ -1,21 +1,61 @@
 import {uploadFile} from "../../api/s3";
-import {createFormErrors, FormError, InvalidRequestError} from "../../lib/errors";
+import {createFormErrors, FormError, InternalError, InvalidRequestError} from "../../lib/errors";
+import Vgm from "../../models/Vgm";
+import mongoose, {HydratedDocument} from "mongoose";
+import slugify from "slugify";
+import path from "path";
 
 /**
  * Create a VGM file
  * POST /api/vgm/
+ *
+ * files uploaded to s3: /users/:userId/vgm/:vgmId/
+ * - vgm file: <slugified filename>.<ext>
+ * - coverart: coverart.<ext>
  */
 export const createOne = async function(req, res, next) {
-    if (!req.files) return next(new InvalidRequestError("missing files"));
+    const files = req.files;
+    if (!files) return next(new InternalError("Missing files in request"));
 
-    const file = req.files["file-upload"];
-    if (file && file.buffer.length) {
-        await uploadFile(file.filename, file.buffer);
-    } else {
-        return res.json(createFormErrors(new FormError("file-upload", "Missing file upload")));
+    const user = req.user;
+    if (!user) return next(new InternalError("Missing user in request"));
+
+    // create vgm
+    let vgm: HydratedDocument<VGMuse.IVgm>;
+    try {
+        vgm = new Vgm(req.body);
+        vgm.user = user._id;
+        await vgm.save();
+    } catch(e) {
+        if (e instanceof mongoose.Error.ValidationError) {
+            return res.json(e);
+        }
+        return next(e);
     }
 
-    return res.json(req.files);
+
+    const file = files["file-upload"];
+    if (!file || !file.buffer.length) {
+        const error = new FormError();
+        error.pushError("file-upload", "Missing file upload");
+        return res.json(error);
+    }
+
+    if (!file.filename) {
+        const error = new FormError();
+        error.pushError("file-upload", "Missing filename");
+        return res.json(error);
+    }
+
+    // construct folder path
+    const folder = `/users/${user._id}/vgm/${vgm._id}/`;
+    const vgmFilename = `${vgm.slug}${path.extname(file.filename)}`;
+
+    // TODO: scan file for vgm validity
+
+    await uploadFile(folder + vgmFilename, file.buffer);
+
+    return res.json(vgm);
 
 } as VGMuse.MiddlewareFunction;
 
