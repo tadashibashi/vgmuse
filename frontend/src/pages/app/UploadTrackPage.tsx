@@ -81,6 +81,14 @@ export default function() {
         navigateService.get()(urls.app.myTracks.path);
     }
 
+    function catchException(err: unknown) {
+        const errors: any = err;
+        if (typeof errors.message === "string")
+            setErrors([errors.message]);
+        setShowErrors(true);
+        setIsSendingForm(false);
+    }
+
 
     return (
         <div onDrop={e => e.preventDefault()}>
@@ -101,7 +109,8 @@ export default function() {
                 </ul>
             </Alert>
         </Transition>
-        <Form action="/api/vgm" method="POST" shouldSubmit={onShouldSubmit} onValidationError={onValidationError} onSuccess={onSuccess} className="max-w-lg mx-auto">
+
+        <Form action="/api/vgm" method="POST" shouldSubmit={onShouldSubmit} onValidationError={onValidationError} onSuccess={onSuccess} className="max-w-lg mx-auto" catchException={catchException}>
 
             {/*VGM Upload Panel*/}
             <div className="col-span-full">
