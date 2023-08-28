@@ -1,14 +1,13 @@
 import React, {Fragment, useEffect, useState} from 'react'
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import {
-    Bars3Icon,
-    BellIcon, BuildingLibraryIcon,
-    ChartPieIcon,
-    Cog6ToothIcon, GlobeEuropeAfricaIcon,
-    MusicalNoteIcon, ShoppingCartIcon,
+    BellIcon,
+    Cog6ToothIcon,
+    GlobeEuropeAfricaIcon,
+    MusicalNoteIcon,
     ArrowUpOnSquareStackIcon,
     UserIcon,
-    XMarkIcon,
+    RocketLaunchIcon,
 } from '@heroicons/react/24/outline'
 import {
     ChevronDownIcon,
@@ -25,7 +24,7 @@ import {Routes} from "../../components/Routes";
 import MusicPlayer from "../../components/player/MusicPlayer.tsx";
 
 const userNavbar = [
-    { name: "Explore", href: "/app/explore", icon: GlobeEuropeAfricaIcon, current: true },
+    { name: "Explore", href: "/app/explore", icon: RocketLaunchIcon, current: true },
     { name: "Muse Files", href: "/app/tracks", icon: MusicalNoteIcon, current: false },
     { name: "Upload", href: "/app/upload-track", icon: ArrowUpOnSquareStackIcon, current: false }
     // { name: 'Store', href: '#', icon: ShoppingCartIcon, current: false },
@@ -315,7 +314,7 @@ export default function AppPages() {
                         </div>
                     </div>
 
-                    <main className="py-10">
+                    <main className="py-8">
                         <div className="px-4 sm:px-6 lg:px-8">
                             <Routes urls={pages} />
                         </div>
