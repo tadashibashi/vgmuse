@@ -1,5 +1,5 @@
-import React, {Fragment, useEffect, useState} from 'react'
-import { Dialog, Menu, Transition } from '@headlessui/react'
+import React, {Fragment, useEffect, useState} from 'react';
+import { Menu, Transition } from '@headlessui/react';
 import {
     BellIcon,
     Cog6ToothIcon,
@@ -8,16 +8,13 @@ import {
     ArrowUpOnSquareStackIcon,
     UserIcon,
     RocketLaunchIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 import {
     ChevronDownIcon,
-    CodeBracketIcon,
-    MagnifyingGlassIcon
 } from '@heroicons/react/20/solid'
-import Form from "../../components/Form.tsx";
 import {getUser, logout} from "../../api/auth.ts";
 import urls, {URLDirectory} from "../../urls.tsx";
-import {Link, Route, useLocation} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import {navigateService} from "../../services";
 import {getSubpaths} from "../../lib/paths.ts";
 import {Routes} from "../../components/Routes";
@@ -40,7 +37,6 @@ const playlists = [
     { id: 1, name: 'Coming Soon...', href: '#', initial: 'C', current: false },
 
 ];
-
 
 
 function classNames(...classes: string[]) {
@@ -79,8 +75,11 @@ export default function AppPages() {
         setUser(getUser());
     }, []);
 
+
+
+
     return (
-        <>
+            <>
             <div>
 
                 {/* Static sidebar for mobile */}
