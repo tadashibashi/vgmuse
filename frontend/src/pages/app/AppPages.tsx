@@ -83,7 +83,7 @@ export default function AppPages() {
             <div>
 
                 {/* Static sidebar for mobile */}
-                <div className="fixed inset-y-0 z-50 flex w-18 flex-col lg:hidden">
+                <div className="fixed inset-y-0 z-[100] flex w-18 flex-col lg:hidden">
                     {/* Sidebar component, swap this element with another sidebar if you like */}
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white pb-4">
                         <div className="flex w-auto items-center">
@@ -143,7 +143,7 @@ export default function AppPages() {
                 </div>
 
                 {/* Static sidebar for desktop */}
-                <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-48 lg:flex-col">
+                <div className="hidden lg:fixed lg:inset-y-0 z-[100] lg:flex lg:w-48 lg:flex-col">
                     {/* Sidebar component, swap this element with another sidebar if you like */}
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
                         <div className="flex h-12 shrink-0 items-center">
@@ -228,7 +228,7 @@ export default function AppPages() {
                     </div>
                 </div>
 
-                <div className="pl-[100px] lg:pl-48">
+                <div className="pl-[100px] lg:pl-48 z-[100]">
                     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-6 shadow-sm sm:gap-x-6 lg:px-8">
 
                         <div className="flex flex-1 gap-x-4 self-stretch">
@@ -314,7 +314,7 @@ export default function AppPages() {
                         </div>
                     </div>
 
-                    <main className="py-8">
+                    <main className="py-8 z-0">
                         <div className="px-4 sm:px-6 lg:px-8">
                             <Routes urls={pages} />
                         </div>
