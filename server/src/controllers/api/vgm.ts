@@ -1,8 +1,9 @@
 import {uploadFile} from "../../api/s3";
-import {FormError, InternalError} from "../../lib/errors";
+import {FormError, InternalError, InvalidRequestError} from "../../lib/errors";
 import Vgm from "../../models/Vgm";
 import mongoose, {HydratedDocument} from "mongoose";
 import path from "path";
+import {User} from "../../models";
 
 /**
  * Create a VGM file
@@ -122,8 +123,19 @@ export const readOne = function(req, res, next) {
  * Read a user's VGM files
  * GET /api/vgm/:username
  */
-export const readAll = function(req, res, next) {
+export const readAll = async function(req, res, next) {
 
+    const username = req.params["username"];
+    const user = await User.findOne({username});
 
+    if (!user)
+        return res.status(404).json("resources could not be found");
+
+    try {
+        const vgms = await Vgm.find({user: user._id});
+        return res.json(vgms);
+    } catch(err) {
+        return next(err);
+    }
 
 } as VGMuse.MiddlewareFunction;
