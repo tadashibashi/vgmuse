@@ -7,6 +7,7 @@ import urls from "../../urls.tsx";
 import {Transition} from "@headlessui/react";
 import Alert from "../../components/Alert.tsx";
 import VGMDropZone from "../../components/inputs/VGMDropZone.tsx";
+import {VgmMeta} from "../../services/vgm.ts";
 
 
 export default function() {
@@ -15,6 +16,8 @@ export default function() {
 
     const [errors, setErrors] = useState<string[]>([]);
     const [showErrors, setShowErrors] = useState<boolean>(false);
+
+    const titleInputRef = useRef<HTMLInputElement>(null);
 
     function onValidationError(e: FormErrors) {
         setIsSendingForm(false);
@@ -67,12 +70,13 @@ export default function() {
         <Form action="/api/vgm" method="POST" shouldSubmit={onShouldSubmit} onValidationError={onValidationError} onSuccess={onSuccess} className="max-w-lg mx-auto" catchException={catchException}>
 
             {/*Title*/}
-            <div>
+            <div className="sr-only">
                 <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900 mt-4">
                     Title
                 </label>
                 <div className="mt-2">
                     <input
+                        ref={titleInputRef}
                         type="text"
                         name="title"
                         id="title"
@@ -84,7 +88,7 @@ export default function() {
 
             {/*VGM Upload Panel*/}
             <div className="col-span-full mt-4">
-                <VGMDropZone fileInputName="file-upload" />
+                <VGMDropZone fileInputName="file-upload" onFile={() => { if (titleInputRef.current) titleInputRef.current.value = VgmMeta.albumTitle() }} />
             </div>
 
 
