@@ -3,6 +3,7 @@ import PlayerControls from "./PlayerControls.tsx";
 import React, {useEffect, useRef, useState} from "react";
 
 import {VGMPlayer} from "../../services/vgm";
+import {MusicalNoteIcon} from "@heroicons/react/24/outline";
 
 export default function() {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -13,7 +14,7 @@ export default function() {
 
     const barRef = useRef<HTMLDivElement>(null);
     const interval = useRef<NodeJS.Timeout | null>(null);
-
+    const [trackPercent, setTrackPercent] = useState(0);
 
     function onVolumeChange(evt: React.FormEvent<HTMLInputElement>) {
         const newVol = parseFloat(evt.currentTarget.value);
@@ -24,13 +25,20 @@ export default function() {
     function onPlayClick() {
         if (VGMPlayer.getAlbumTitle()) {
             VGMPlayer.setPause(isPlaying);
-            console.log(VGMPlayer.getTotalTime());
         }
-
     }
 
-
     useEffect(() => {
+
+        interval.current = setInterval(() => {
+            const totalTime = VGMPlayer.getTotalTime() || 1;
+            const percent = VGMPlayer.getCurrentTime() / totalTime;
+            setTrackPercent(Math.max(Math.min(percent, 1), 0));
+
+            if (VGMPlayer.getCurrentTrack() !== track)
+                setTrack(VGMPlayer.getCurrentTrack());
+        }, 250);
+
 
         // set up delegation listen and unlisten here
         function onPlayPause(data: {albumTitle: string; track: number; author: string; isPaused: boolean;}) {
@@ -51,6 +59,9 @@ export default function() {
         return () => {
             VGMPlayer.onPlayPause.removeListener(onPlayPause);
             VGMPlayer.onTrackStart.removeListener(onTrackStart);
+
+            if (interval.current)
+                clearInterval(interval.current);
         }
     }, []);
 
@@ -84,14 +95,23 @@ export default function() {
                         <div className="h-full flex-grow p-0 m-0 w-auto">
 
                             {/* Title / Composer */}
-                            <div className="grid grid-rows-2 h-[91%] w-auto text-[13px] overflow-hidden">
-                                <div className="flex items-center justify-center pt-1.5 text-gray-600 whitespace-nowrap overflow-hidden">{albumTitle}</div>
-                                <div className="flex items-center justify-center text-gray-400 whitespace-nowrap overflow-hidden">{albumTitle && `${author} –– Track ${track + 1}`}</div>
-                            </div>
+                            {
+                                albumTitle ? (
+                                    <div className="grid grid-rows-2 h-[91%] w-auto text-[13px] overflow-hidden">
+                                        <div className="flex items-center justify-center pt-1.5 text-gray-600 whitespace-nowrap overflow-hidden">{albumTitle && `${albumTitle} –– Track ${track + 1}`}</div>
+                                        <div className="flex items-center justify-center text-gray-400 whitespace-nowrap overflow-hidden">{albumTitle && `${author}`}</div>
+                                    </div>
+                                ) : (
+                                    <div className="flex justify-center items-center h-[91%]">
+                                        <MusicalNoteIcon className="w-6 h-6 text-gray-400" />
+                                    </div>
+                                )
+                            }
+
 
                             {/* Play bar */}
                             <div className="h-[9%] w-full bg-gray-200">
-                                <div ref={barRef} className="playback-bar bg-gray-500 w-1/2 h-full"></div>
+                                <div ref={barRef} className="playback-bar bg-gray-500 h-full" style={{width: trackPercent * 100 + "%"}}></div>
                             </div>
                         </div>
                     </section>
