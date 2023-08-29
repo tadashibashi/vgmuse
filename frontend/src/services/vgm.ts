@@ -9,6 +9,8 @@ const _load_vgm = Module.cwrap("load_vgm", "string", ["string"]);
 const _load_data = Module.cwrap("load_data", "string", ["number", "number"]);
 const _start_track = Module.cwrap("start_track", "string", ["number"]);
 const _pause_track = Module.cwrap("pause_track", "string", ["boolean"]);
+const _track_paused = Module.cwrap("track_paused", "boolean", []);
+const _track_count = Module.cwrap("track_count", "number", []);
 const _current_track = Module.cwrap("current_track", "number", []);
 const _current_time = Module.cwrap("current_time", "number", []);
 const _total_time = Module.cwrap("total_time", "number", []);
@@ -73,6 +75,10 @@ export namespace VGMPlayer {
         });
     }
 
+    export function getPaused() {
+        return _track_paused();
+    }
+
     export function setVolume(vol: number) {
         _set_volume(vol);
     }
@@ -95,6 +101,10 @@ export namespace VGMPlayer {
 
     export function getTotalTime(): number {
         return _total_time();
+    }
+
+    export function getTotalTracks(): number {
+        return _track_count();
     }
 
     export function getCurrentTrack(): number {

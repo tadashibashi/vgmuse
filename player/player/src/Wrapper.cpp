@@ -38,6 +38,14 @@ extern "C" {
         }
     }
 
+    bool track_paused() {
+        return player.pause();
+    }
+
+    int track_count() {
+        return player.track_count();
+    }
+
     int current_track() {
         return player.current_track();
     }

@@ -62,7 +62,7 @@ namespace vgmuse {
         error_t start_track(int track);
 
         [[nodiscard]]
-        int trackCount() const;
+        int track_count() const;
 
         void stop();
 
@@ -73,6 +73,9 @@ namespace vgmuse {
 
 
         void pause(bool p);
+
+        [[nodiscard]]
+        bool pause() const;
     private:
         friend void fillOutBuffer(void *data, short *out, int count);
         struct Impl;

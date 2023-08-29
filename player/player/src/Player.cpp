@@ -11,7 +11,7 @@ namespace vgmuse {
     static std::vector<int16_t> buf{};
 
     struct Player::Impl {
-        Impl(): audio{}, emu{}, current_track{}, volume{.75} {}
+        Impl(): audio{}, emu{}, current_track{}, volume{.75}, paused(true) {}
         ~Impl()
         {
             if (emu)
@@ -25,6 +25,7 @@ namespace vgmuse {
 
         int current_track;
         float volume;
+        bool paused;
     };
 
     void fillOutBuffer(void *data, short *out, int count)
@@ -92,13 +93,18 @@ namespace vgmuse {
         return SUCCESS;
     }
 
+
     void Player::unload()
     {
         m->audio.stop();
-
+        if (m->emu) {
+            gme_delete(m->emu);
+            m->emu = nullptr;
+        }
     }
 
-    int Player::trackCount() const
+
+    int Player::track_count() const
     {
         if (!m->emu) return 0;
 
@@ -111,6 +117,7 @@ namespace vgmuse {
             m->audio.stop();
         else
             m->audio.start();
+        m->paused = p;
     }
 
 
@@ -187,6 +194,11 @@ namespace vgmuse {
         gme_free_info(info);
 
         return author;
+    }
+
+    bool Player::pause() const
+    {
+        return m->paused;
     }
 
 }
