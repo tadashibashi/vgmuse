@@ -144,12 +144,12 @@ export default ({className, fileInputName, onFile}: {className?: string, fileInp
                                 </div>
                                 <PlaybackIcon className="text-gray-300 h-16 m-auto absolute top-12 left-12 group-hover:opacity-100 opacity-0 transition-opacity duration-300" onClick={onClickPlayback} />
                                 <div
-                                    className="relative drop-shadow-sm py-12 col-span-1 flex flex-col justify-center items-center opacity-100 group-hover:opacity-10 transition-opacity duration-300"
+                                    className="select-none relative drop-shadow-sm py-12 col-span-1 flex flex-col justify-center items-center opacity-100 group-hover:opacity-10 transition-opacity duration-300"
                                     onClick={onClickPlayback}
                                 >
 
                                     <MusicalNoteIcon className="text-gray-300 h-16 m-auto" />
-                                    <p className="text-tiny text-gray-200 mt-2">{"File contains " + trackCount + " " + (trackCount > 1 ? "tracks" : "track")} </p>
+                                    <p className="text-tiny text-gray-200 mt-2 select-none">{"File contains " + trackCount + " " + (trackCount > 1 ? "tracks" : "track")} </p>
                                 </div>
                                 <div className="px-6 py-10 col-span-2 flex flex-col  border-l-[1px] border-gray-50">
                                     <h2 className="text-gray-600 text-lg font-bold drop-shadow-sm">{albumTitle || "Untitled"}</h2>
