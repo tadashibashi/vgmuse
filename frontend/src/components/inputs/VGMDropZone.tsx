@@ -30,7 +30,8 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
         const file = files[0];
 
         try {
-            console.log(await VgmMeta.load(file));
+            await VgmMeta.load(file);
+
             setAuthor(VgmMeta.author());
             setAlbumTitle(VgmMeta.albumTitle());
             setTrackCount(VgmMeta.trackCount());
@@ -82,7 +83,21 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
 
         playPause().catch(console.error).then(console.log);
 
-    }, [isPlaying])
+    }, [isPlaying]);
+
+    useEffect(() => {
+        function onPlayPause(data: {albumTitle: string, author: string, track: number, isPaused: boolean}) {
+            if (data.albumTitle === albumTitle) {
+                setIsPlaying(data.isPaused);
+            }
+        }
+
+        VGMPlayer.onPlayPause.addListener(onPlayPause);
+
+        return () => {
+            VGMPlayer.onPlayPause.removeListener(onPlayPause);
+        };
+    }, []);
 
 
     return (
@@ -99,9 +114,9 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
                     filename ?
                         (
                             <div className="grid grid-cols-3 w-full h-full relative">
-                                <div className="absolute top-1 right-1">
+                                <div className="absolute top-2 right-2">
                                     <XMarkIcon
-                                        className="h-8 w-8 text-gray-300 hover:bg-gray-50 hover:border-[1px] hover:text-red-100 active:text-red-300 border-gray-100 rounded border-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        className="h-6 w-6 text-gray-300 hover:bg-gray-50 hover:border-[1px] hover:text-red-100 active:text-red-300 border-gray-100 rounded border-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                         onClick={() => clearFiles()}
                                     />
                                 </div>
@@ -112,12 +127,12 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
                                 >
 
                                     <MusicalNoteIcon className="text-gray-300 h-16 m-auto" />
-                                    <p className="text-tiny text-gray-200">{filename}</p>
+                                    <p className="text-tiny text-gray-200 mt-2">{"File contains " + trackCount + " " + (trackCount > 1 ? "tracks" : "track")} </p>
                                 </div>
                                 <div className="px-6 py-10 col-span-2 flex flex-col  border-l-[1px] border-gray-50">
                                     <h2 className="text-gray-600 text-lg font-bold drop-shadow-sm">{albumTitle || "Untitled"}</h2>
                                     <p className="text-gray-400 text-sm mb-2">by {author || "Unknown"}</p>
-                                    <p className="text-gray-300 text-sm">{"File contains " + trackCount + " " + (trackCount > 1 ? "tracks" : "track")} </p>
+                                    <p className="text-gray-300 text-sm">{filename}</p>
                                 </div>
                             </div>
                         ) : (
