@@ -4,13 +4,15 @@ import {CloudArrowUpIcon, MusicalNoteIcon} from "@heroicons/react/24/outline";
 import {VgmMeta, VGMPlayer} from "../../services/vgm.ts";
 import {PlayIcon, XMarkIcon} from "@heroicons/react/24/solid";
 import {PauseIcon} from "@heroicons/react/20/solid";
+import getAuthor = VGMPlayer.getAuthor;
 
 /**
  *
  * @param className
  * @param fileInputName - sets both id and name of the internal input
+ * @param onFile - optional callback when file gets loaded to the dropzone
  */
-export default ({className, fileInputName}: {className?: string, fileInputName: string}) => {
+export default ({className, fileInputName, onFile}: {className?: string, fileInputName: string, onFile?: (file: File) => void}) => {
     const [filename, setFilename] = useState("");
     const [albumTitle, setAlbumTitle] = useState("");
     const [author, setAuthor] = useState("");
@@ -32,6 +34,10 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
         try {
             await VgmMeta.load(file);
 
+            if (albumTitle === VGMPlayer.getAlbumTitle()) {
+                VGMPlayer.setPause(true);
+            }
+
             setAuthor(VgmMeta.author());
             setAlbumTitle(VgmMeta.albumTitle());
             setTrackCount(VgmMeta.trackCount());
@@ -47,6 +53,7 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
 
         input.files = dt.files;
         setFilename(input.files[0].name.replace("C:\\fakepath\\", ""));
+        if (onFile) onFile(file);
     }
 
     function clearFiles() {
@@ -58,44 +65,59 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
         setAuthor("");
         setAlbumTitle("");
         setTrackCount(0);
+
+        VGMPlayer.setPause(true);
     }
 
     function onFilenameChange(evt: React.FormEvent<HTMLInputElement>) {
         setFilename(evt.currentTarget.value.replace("C:\\fakepath\\", ""));
     }
 
-    function onClickPlayback(evt: React.MouseEvent) {
-        setIsPlaying(!isPlaying);
+    async function onClickPlayback(evt: React.MouseEvent) {
+        if (isPlayingLoadedAlbum()) {
+            VGMPlayer.setPause(!VGMPlayer.getPaused());
+        } else {
+            if (inputRef.current?.files?.length) {
+                await VGMPlayer.loadFile(inputRef.current.files[0]);
+                VGMPlayer.startTrack(0);
+            }
+        }
     }
 
-    useEffect(() => {
-        async function playPause() {
-            const input = inputRef.current;
-            if (!input) return;
 
-            if (isPlaying && input.files?.length) {
-                console.log(await VGMPlayer.loadFile(input.files[0]));
-                VGMPlayer.startTrack(0);
-            } else {
-                VGMPlayer.setPause(true);
+
+    function isPlayingLoadedAlbum() {
+        return albumTitle !== "" && VGMPlayer.getAlbumTitle() === albumTitle;
+    }
+
+
+    const albumTitleRef = useRef("");
+    albumTitleRef.current = albumTitle;
+
+
+
+
+
+    useEffect(() => {
+        const onPlayPause = (data: {albumTitle: string, author: string, track: number, isPaused: boolean}) => {
+            const albumTitle = albumTitleRef.current;
+            if (data.albumTitle === albumTitle && albumTitle) {
+                setIsPlaying(!data.isPaused);
             }
         }
 
-        playPause().catch(console.error).then(console.log);
-
-    }, [isPlaying]);
-
-    useEffect(() => {
-        function onPlayPause(data: {albumTitle: string, author: string, track: number, isPaused: boolean}) {
-            if (data.albumTitle === albumTitle) {
-                setIsPlaying(data.isPaused);
+        const onTrackStart = (data: {albumTitle: string, author: string, track: number}) => {
+            const albumTitle = albumTitleRef.current;
+            if (data.albumTitle === albumTitle && albumTitle) {
+                setIsPlaying(true);
             }
         }
 
         VGMPlayer.onPlayPause.addListener(onPlayPause);
-
+        VGMPlayer.onTrackStart.addListener(onTrackStart);
         return () => {
             VGMPlayer.onPlayPause.removeListener(onPlayPause);
+            VGMPlayer.onTrackStart.removeListener(onTrackStart);
         };
     }, []);
 
