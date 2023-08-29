@@ -1,8 +1,9 @@
 import FileDropZone from "./FileDropZone.tsx";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {CloudArrowUpIcon, MusicalNoteIcon} from "@heroicons/react/24/outline";
-import {VgmMeta} from "../../services/vgm.ts";
+import {VgmMeta, VGMPlayer} from "../../services/vgm.ts";
 import {PlayIcon, XMarkIcon} from "@heroicons/react/24/solid";
+import {PauseIcon} from "@heroicons/react/20/solid";
 
 /**
  *
@@ -16,7 +17,11 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
     const [trackCount, setTrackCount] = useState(0);
     const [dragActive, setDragActive] = useState(false);
 
+    const [isPlaying, setIsPlaying] = useState(false);
+
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const PlaybackIcon = isPlaying ? PauseIcon : PlayIcon;
 
     async function onFiles(files: FileList) {
         const input = inputRef.current;
@@ -58,6 +63,27 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
         setFilename(evt.currentTarget.value.replace("C:\\fakepath\\", ""));
     }
 
+    function onClickPlayback(evt: React.MouseEvent) {
+        setIsPlaying(!isPlaying);
+    }
+
+    useEffect(() => {
+        async function playPause() {
+            const input = inputRef.current;
+            if (!input) return;
+
+            if (isPlaying && input.files?.length) {
+                console.log(await VGMPlayer.loadFile(input.files[0]));
+                VGMPlayer.startTrack(0);
+            } else {
+                VGMPlayer.setPause(true);
+            }
+        }
+
+        playPause().catch(console.error).then(console.log);
+
+    }, [isPlaying])
+
 
     return (
         <div className={className}>
@@ -79,8 +105,11 @@ export default ({className, fileInputName}: {className?: string, fileInputName: 
                                         onClick={() => clearFiles()}
                                     />
                                 </div>
-                                <PlayIcon className="text-gray-300 h-16 m-auto absolute top-12 left-12 group-hover:opacity-100 opacity-0 transition-opacity duration-300" />
-                                <div className="relative drop-shadow-sm py-12 col-span-1 flex flex-col justify-center items-center opacity-100 group-hover:opacity-25 transition-opacity duration-300">
+                                <PlaybackIcon className="text-gray-300 h-16 m-auto absolute top-12 left-12 group-hover:opacity-100 opacity-0 transition-opacity duration-300" onClick={onClickPlayback} />
+                                <div
+                                    className="relative drop-shadow-sm py-12 col-span-1 flex flex-col justify-center items-center opacity-100 group-hover:opacity-10 transition-opacity duration-300"
+                                    onClick={onClickPlayback}
+                                >
 
                                     <MusicalNoteIcon className="text-gray-300 h-16 m-auto" />
                                     <p className="text-tiny text-gray-200">{filename}</p>
