@@ -1,4 +1,4 @@
-import React, {RefObject, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import Form from "../../components/Form.tsx";
 import LoadButton from "../../components/buttons/LoadButton.tsx";
 import {FormErrors} from "../../lib/formValidation.ts";
@@ -67,6 +67,7 @@ export default function() {
             </Alert>
         </Transition>
 
+
         <Form action="/api/vgm" method="POST" shouldSubmit={onShouldSubmit} onValidationError={onValidationError} onSuccess={onSuccess} className="max-w-lg mx-auto" catchException={catchException}>
 
             {/*Title*/}
@@ -90,7 +91,6 @@ export default function() {
             <div className="col-span-full mt-4">
                 <VGMDropZone fileInputName="file-upload" onFile={() => { if (titleInputRef.current) titleInputRef.current.value = VgmMeta.albumTitle() }} />
             </div>
-
 
 
             <LoadButton className="mt-4" type="submit" isLoading={isSendingForm} loadingText="Processing..." text="Upload" />

@@ -30,7 +30,7 @@ export default () => {
                 <div className="flex flex-wrap gap-4 justify-start justify-items-start place-items-start h-full w-full">
                     {
                         museFiles.map(file => <div key={file._id.toString()} className="relative col-span-1 row-span-1 w-full sm:w-full md:w-[calc(33%-15px)] lg:w-[calc(20%-14px)] group mt-8">
-                                <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-50 h-10 w-10 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-40 h-10 w-10 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                     <PlayIcon onClick={async () => {
                                         await VGMPlayer.load(`https://files.vgmuse.com/${file.fileKey}`);
                                         VGMPlayer.startTrack(0);
