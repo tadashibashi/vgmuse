@@ -1,6 +1,6 @@
 # VGMuse
 
-Chiptune Music Library and Social Space
+Chiptune Music Library and Social Space @ [vgmuse.com](https://vgmuse.com)
 
 ![title screenshot](readme/title-screenshot.png)
 
