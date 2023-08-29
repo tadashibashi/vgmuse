@@ -66,6 +66,7 @@ namespace vgmuse {
 
         ERR_CHECK(gme_start_track(m->emu, track));
         m->audio.start();
+        m->current_track = track;
 
         return SUCCESS;
     }
