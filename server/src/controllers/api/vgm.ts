@@ -80,11 +80,13 @@ export const createOne = async function(req, res, next) {
  * GET /api/vgm/search
  * Query parameters: q, search string
  */
-export const search = function(req, res, next) {
+export const search = async function(req, res, next) {
     const q = req.params["q"];
 
     // default, no q param gets latest tracks
+    const vgms = await Vgm.find({}).sort({createdAt: "desc"});
 
+    return res.json(vgms);
 
 } as VGMuse.MiddlewareFunction;
 

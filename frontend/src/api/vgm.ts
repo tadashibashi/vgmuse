@@ -13,6 +13,14 @@ export async function getOne(id: string) {
     return request(`${BASE_URL}/${id}`);
 }
 
+export async function search(query?: string) {
+    if (query) {
+        return request(`${BASE_URL}?q=${encodeURIComponent(query)}`);
+    } else {
+        return request(`${BASE_URL}`);
+    }
+}
+
 export async function createOne(formData: FormData) {
     return sendForm(BASE_URL, "POST", formData);
 }
