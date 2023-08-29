@@ -5,8 +5,8 @@ const BASE_URL = "/api/vgm";
 /**
  * Get a logged in user's vgm
  */
-export async function getAll() {
-    return request(BASE_URL);
+export async function getAll(username: string) {
+    return request(BASE_URL + "/" + username);
 }
 
 export async function getOne(id: string) {
