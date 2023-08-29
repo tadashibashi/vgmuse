@@ -13,6 +13,20 @@ void test_meta() {
     std::cout << info->copyright << '\n';
 }
 
+void test_player() {
+    player.load("test.nsf");
+    player.start_track(0);
+}
+
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+
+void em_main() {
+
+}
+
+#endif
+
 void driver() {
     if (SDL_Init(SDL_INIT_AUDIO) != 0)
     {
@@ -24,7 +38,9 @@ void driver() {
     if (res)
         std::cerr << res << '\n';
 
-
+#ifdef EMSCRIPTEN
+    emscripten_set_main_loop(em_main, 20, true);
+#else
     bool isRunning = true;
     while(isRunning) {
         SDL_Event ev;
@@ -34,6 +50,7 @@ void driver() {
         }
         SDL_Delay(64);
     }
+#endif
 
     SDL_Quit();
 };
