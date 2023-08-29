@@ -1,14 +1,23 @@
 import PlayerControls from "./PlayerControls.tsx";
 
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
+
+import {VGMPlayer} from "../../services/vgm";
 
 export default function() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [track, setTrack] = useState(0);
+    const [volume, setVolume] = useState(.75);
 
     const barRef = useRef<HTMLDivElement>(null);
     const interval = useRef<NodeJS.Timeout | null>(null);
 
+    function onVolumeChange(evt: React.FormEvent<HTMLInputElement>) {
+        const newVol = parseFloat(evt.currentTarget.value);
+        setVolume(newVol);
+        VGMPlayer.setVolume(newVol);
+        console.log(VGMPlayer.getVolume());
+    }
 
 
     useEffect(() => {
@@ -62,8 +71,10 @@ export default function() {
                             </div>
                         </div>
                     </section>
+                </div>
 
-
+                <div className="col-span-1 flex justify-center items-center">
+                    <input type="range" min={0} max={1} step={.025} onChange={onVolumeChange} value={volume}/>
                 </div>
             </div>
             </div>
