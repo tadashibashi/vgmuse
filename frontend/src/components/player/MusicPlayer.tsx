@@ -1,10 +1,25 @@
 import PlayerControls from "./PlayerControls.tsx";
 
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 export default function() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [track, setTrack] = useState(0);
+
+    const barRef = useRef<HTMLDivElement>(null);
+    const interval = useRef<NodeJS.Timeout | null>(null);
+
+
+
+    useEffect(() => {
+        // set up delegation listen and unlisten here
+
+
+
+        return () => {
+
+        }
+    }, []);
 
     return (
         <>
@@ -43,7 +58,7 @@ export default function() {
 
                             {/* Play bar */}
                             <div className="h-[9%] w-full bg-gray-200">
-                                <div className="playback-bar bg-gray-500 w-1/2 h-full"></div>
+                                <div ref={barRef} className="playback-bar bg-gray-500 w-1/2 h-full"></div>
                             </div>
                         </div>
                     </section>
