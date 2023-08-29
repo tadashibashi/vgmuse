@@ -90,7 +90,7 @@ export default function AppPages() {
                             <img
                                 className="h-12 w-12 mx-auto mt-1 drop-shadow-md"
                                 src="/images/logo/logo.png"
-                                alt="Your Company"
+                                alt="VGMuse"
                             />
                         </div>
                         <nav className="flex flex-1 flex-col">
@@ -250,10 +250,10 @@ export default function AppPages() {
                             {/*</Form>*/}
                             <MusicPlayer />
                             <div className="flex items-center gap-x-4 lg:gap-x-6">
-                                <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-                                    <span className="sr-only">View notifications</span>
-                                    <BellIcon className="h-6 w-6" aria-hidden="true" />
-                                </button>
+                                {/*<button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">*/}
+                                {/*    <span className="sr-only">View notifications</span>*/}
+                                {/*    <BellIcon className="h-6 w-6" aria-hidden="true" />*/}
+                                {/*</button>*/}
 
                                 {/* Separator */}
                                 <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" aria-hidden="true" />
