@@ -53,7 +53,6 @@ export const createOne = async function(req, res, next) {
     const vgmFilename = `${vgm.slug}${path.extname(file.filename)}`;
     const fileKey = folder + vgmFilename;
 
-    // TODO: scan file on frontend for vgm validity
 
     try {
         await uploadFile(folder + vgmFilename, file.buffer);
