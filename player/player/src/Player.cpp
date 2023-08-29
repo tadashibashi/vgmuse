@@ -4,11 +4,20 @@
 #include "Gme.hpp"
 #include "Error.h"
 #include <iostream>
-#include <atomic>
+#include <string>
 
 namespace vgmuse {
 
     static std::vector<int16_t> buf{};
+
+    struct TrackInfo {
+        std::string game{};
+        std::string title{};
+        int play_length{};
+        int length{};
+        int fade_length{};
+        std::string author{};
+    };
 
     struct Player::Impl {
         Impl(): audio{}, emu{}, current_track{}, volume{.75}, paused(true) {}
@@ -26,6 +35,7 @@ namespace vgmuse {
         int current_track;
         float volume;
         bool paused;
+        TrackInfo track_info;
     };
 
     void fillOutBuffer(void *data, short *out, int count)
@@ -64,9 +74,38 @@ namespace vgmuse {
     {
         if (!m->emu) return "Emu is not loaded";
 
+        m->audio.stop();
         ERR_CHECK(gme_start_track(m->emu, track));
-        m->audio.start();
+
         m->current_track = track;
+        m->paused = false;
+
+        gme_info_t *info;
+        ERR_CHECK(gme_track_info(m->emu, &info, m->current_track));
+
+        // Calculate track length
+        if ( info->length <= 0 )
+            info->length = info->intro_length +
+                           info->loop_length * 2;
+
+        if ( info->length <= 0 )
+            info->length = (long) (2.5 * 60 * 1000);
+
+        m->track_info.play_length = info->play_length;
+        m->track_info.fade_length = info->fade_length < 0 ? 0 : info->fade_length;
+        m->track_info.game = std::string(info->game);
+        m->track_info.author = std::string(info->author);
+        m->track_info.length = info->length;
+        m->track_info.title = std::string(info->song);
+
+        if (m->track_info.fade_length <= 0)
+            gme_set_fade(m->emu, -1, m->track_info.fade_length);
+        else
+            gme_set_fade(m->emu, m->track_info.length, m->track_info.fade_length);
+
+        gme_free_info(info);
+
+        m->audio.start();
 
         return SUCCESS;
     }
@@ -142,17 +181,7 @@ namespace vgmuse {
     int Player::total_time() const
     {
         if (!m->emu) return 0;
-
-        gme_info_t *info;
-        auto result = gme_track_info(m->emu, &info, m->current_track);
-
-        if (result) return 0;
-
-        int time = info->play_length;
-
-        gme_free_info(info);
-
-        return time;
+        return m->track_info.length;
     }
 
     float Player::volume() const
@@ -169,37 +198,39 @@ namespace vgmuse {
     {
         if (!m->emu) return "";
 
-        gme_info_t *info;
-        auto result = gme_track_info(m->emu, &info, m->current_track);
-
-        if (result) return "";
-
-        std::string title(info->game);
-
-        gme_free_info(info);
-
-        return title;
+        return m->track_info.game;
     }
 
     std::string Player::author() const
     {
         if (!m->emu) return "";
 
-        gme_info_t *info;
-        auto result = gme_track_info(m->emu, &info, m->current_track);
-
-        if (result) return "";
-
-        std::string author(info->author);
-
-        gme_free_info(info);
-
-        return author;
+        return m->track_info.author;
     }
 
     bool Player::pause() const
     {
         return m->paused;
+    }
+
+    void Player::update()
+    {
+        if (!m->emu || m->paused) return;
+
+        if (current_time() >= m->track_info.length) {
+            int next_track = m->current_track + 1;
+            if (next_track >= track_count())
+                pause(true);
+            else
+                start_track(next_track);
+        }
+    }
+
+    bool Player::track_ended() const
+    {
+        if (!m->emu) return false;
+
+        return gme_track_ended(m->emu);
     }
 
 }

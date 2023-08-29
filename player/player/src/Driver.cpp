@@ -22,7 +22,7 @@ void test_player() {
 #include <emscripten.h>
 
 void em_main() {
-
+    player.update();
 }
 
 #endif

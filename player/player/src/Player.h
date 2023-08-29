@@ -76,6 +76,11 @@ namespace vgmuse {
 
         [[nodiscard]]
         bool pause() const;
+
+        void update();
+
+        [[nodiscard]]
+        bool track_ended() const;
     private:
         friend void fillOutBuffer(void *data, short *out, int count);
         struct Impl;
