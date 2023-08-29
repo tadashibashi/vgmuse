@@ -7,26 +7,50 @@ import {VGMPlayer} from "../../services/vgm";
 export default function() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [track, setTrack] = useState(0);
+    const [albumTitle, setAlbumTitle] = useState("");
+    const [author, setAuthor] = useState("");
     const [volume, setVolume] = useState(.75);
 
     const barRef = useRef<HTMLDivElement>(null);
     const interval = useRef<NodeJS.Timeout | null>(null);
 
+
     function onVolumeChange(evt: React.FormEvent<HTMLInputElement>) {
         const newVol = parseFloat(evt.currentTarget.value);
         setVolume(newVol);
         VGMPlayer.setVolume(newVol);
-        console.log(VGMPlayer.getVolume());
+    }
+
+    function onPlayClick() {
+        if (VGMPlayer.getAlbumTitle()) {
+            VGMPlayer.setPause(isPlaying);
+            console.log(VGMPlayer.getTotalTime());
+        }
+
     }
 
 
     useEffect(() => {
+
         // set up delegation listen and unlisten here
+        function onPlayPause(data: {albumTitle: string; track: number; author: string; isPaused: boolean;}) {
+            setIsPlaying(!data.isPaused);
 
+        }
 
+        function onTrackStart(data: {albumTitle: string; track: number; author: string;}) {
+            setIsPlaying(true);
+            setTrack(data.track);
+            setAlbumTitle(data.albumTitle);
+            setAuthor(data.author);
+        }
+
+        VGMPlayer.onPlayPause.addListener(onPlayPause);
+        VGMPlayer.onTrackStart.addListener(onTrackStart);
 
         return () => {
-
+            VGMPlayer.onPlayPause.removeListener(onPlayPause);
+            VGMPlayer.onTrackStart.removeListener(onTrackStart);
         }
     }, []);
 
@@ -39,9 +63,9 @@ export default function() {
                 {/*Controls*/}
                 <div className="col-span-2 flex p-0 m-0 h-full justify-center text-gray-500 gap-2">
                     <PlayerControls isPlaying={isPlaying}
-                                    onPlayClick={() => setIsPlaying(playing => !playing)}
-                                    onForwardClick={() => setTrack(track => track + 1)}
-                                    onBackClick={() => setTrack(track => track - 1)}
+                                    onPlayClick={onPlayClick}
+                                    onForwardClick={() => {if (VGMPlayer.getAlbumTitle()) VGMPlayer.startTrack((VGMPlayer.getCurrentTrack() + 1) % VGMPlayer.getTotalTracks() ) }}
+                                    onBackClick={() => {if (VGMPlayer.getAlbumTitle()) VGMPlayer.startTrack((VGMPlayer.getCurrentTrack() - 1) % VGMPlayer.getTotalTracks()) }}
                     />
                 </div>
 
@@ -61,8 +85,8 @@ export default function() {
 
                             {/* Title / Composer */}
                             <div className="grid grid-rows-2 h-[91%] w-auto text-[13px] overflow-hidden">
-                                <div className="flex items-center justify-center pt-1.5 text-gray-600 whitespace-nowrap overflow-hidden">Octopath Traveler - Main Theme</div>
-                                <div className="flex items-center justify-center text-gray-400 whitespace-nowrap overflow-hidden">Yasunori Nishiki –– Octopath Traveler - Main Theme</div>
+                                <div className="flex items-center justify-center pt-1.5 text-gray-600 whitespace-nowrap overflow-hidden">{albumTitle}</div>
+                                <div className="flex items-center justify-center text-gray-400 whitespace-nowrap overflow-hidden">{albumTitle && `${author} –– Track ${track + 1}`}</div>
                             </div>
 
                             {/* Play bar */}
