@@ -3,6 +3,7 @@
 #include "Error.h"
 #include <cstdint>
 #include <vector>
+#include <string>
 
 namespace vgmuse {
 
@@ -39,8 +40,14 @@ namespace vgmuse {
         [[nodiscard]]
         int total_time() const;
 
+        [[nodiscard]]
+        std::string album_title() const;
+
+        [[nodiscard]]
+        std::string author() const;
+
         /**
-         * get currently playing track
+         * get currently playing track, or -1 if no file is loaded
          */
         [[nodiscard]]
         int current_track() const;
@@ -58,6 +65,12 @@ namespace vgmuse {
         int trackCount() const;
 
         void stop();
+
+        [[nodiscard]]
+        float volume() const;
+
+        void volume(float v);
+
 
         void pause(bool p);
     private:

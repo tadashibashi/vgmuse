@@ -12,7 +12,7 @@ namespace vgmuse {
         ~MetadataReader();
 
         error_t load_mem(const void *data, size_t byte_size);
-        error_t load_file(const char *path);
+        error_t open_file(const char *path);
 
         [[nodiscard]]
         const gme_info_t *load_track_info(int track) const;

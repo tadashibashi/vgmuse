@@ -10,16 +10,28 @@ struct vgmuse::MetadataReader::Impl {
         close();
     }
 
-    error_t open_mem(const void *data, long size)
+    error_t open_mem(const void *data, size_t size)
     {
         Music_Emu *temp_emu;
-        ERR_CHECK( gme_open_data(data, size, &temp_emu, 0) );
+        ERR_CHECK( gme_open_data(data, size, &temp_emu, 44100) );
 
         close();
         emu = temp_emu;
 
         // load first track out of convenience
         ERR_CHECK(load_track_info(0));
+
+        return SUCCESS;
+    }
+
+    error_t open_file(const char *path)
+    {
+        Music_Emu *temp;
+        ERR_CHECK(gme_open_file(path, &temp, 44100));
+
+        if (emu)
+            gme_delete(emu);
+        emu = temp;
 
         return SUCCESS;
     }
@@ -36,6 +48,7 @@ struct vgmuse::MetadataReader::Impl {
         close_info();
         track_info = temp;
         track_queried = track;
+
         return SUCCESS;
     }
 
@@ -62,7 +75,7 @@ struct vgmuse::MetadataReader::Impl {
     void close_info() {
         if (track_info)
         {
-            delete track_info;
+            gme_free_info(track_info);
             track_info = nullptr;
         }
 
@@ -86,12 +99,7 @@ vgmuse::MetadataReader::~MetadataReader()
 
 vgmuse::error_t vgmuse::MetadataReader::load_mem(const void *data, size_t byte_size)
 {
-    Music_Emu *emu;
-    ERR_CHECK(gme_open_data(data, byte_size, &emu, 44100));
-
-    if (m->emu)
-        gme_delete(m->emu);
-    m->emu = emu;
+    ERR_CHECK(m->open_mem(data, byte_size));
 
     return SUCCESS;
 }
@@ -111,14 +119,7 @@ int vgmuse::MetadataReader::track_count() const
     return m->track_count();
 }
 
-vgmuse::error_t vgmuse::MetadataReader::load_file(const char *path)
+vgmuse::error_t vgmuse::MetadataReader::open_file(const char *path)
 {
-    Music_Emu *temp;
-    ERR_CHECK(gme_open_file(path, &temp, 44100));
-
-    if (m->emu)
-        gme_delete(m->emu);
-    m->emu = temp;
-
-    return SUCCESS;
+    return m->open_file(path);
 }

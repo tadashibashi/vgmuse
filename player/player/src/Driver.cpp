@@ -6,7 +6,7 @@ vgmuse::Player player;
 vgmuse::MetadataReader meta;
 
 void test_meta() {
-    meta.load_file("test.nsf");
+    meta.open_file("test.nsf");
     auto info = meta.load_track_info(0);
     std::cout << info->game << '\n';
     std::cout << info->author << '\n';

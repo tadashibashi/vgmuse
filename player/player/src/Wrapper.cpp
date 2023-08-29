@@ -38,6 +38,10 @@ extern "C" {
         }
     }
 
+    int current_track() {
+        return player.current_track();
+    }
+
     int current_time() {
         return player.current_time();
     }
@@ -56,6 +60,26 @@ extern "C" {
 
     size_t buffer_size() {
         return vgmuse::Player::buffer().size();
+    }
+
+    const char *get_author() {
+        static std::string author;
+        author = player.author();
+        return author.c_str();
+    }
+
+    const char *get_album_title() {
+        static std::string album_title;
+        album_title = player.album_title();
+        return album_title.c_str();
+    }
+
+    float get_volume() {
+        return player.volume();
+    }
+
+    void set_volume(float v) {
+        player.volume(v);
     }
 
     error_t load_meta(const void *data, long size)

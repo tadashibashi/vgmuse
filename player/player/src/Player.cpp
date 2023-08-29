@@ -4,13 +4,14 @@
 #include "Gme.hpp"
 #include "Error.h"
 #include <iostream>
+#include <atomic>
 
 namespace vgmuse {
 
     static std::vector<int16_t> buf{};
 
     struct Player::Impl {
-        Impl(): audio{}, emu{}, current_track{} {}
+        Impl(): audio{}, emu{}, current_track{}, volume{.75} {}
         ~Impl()
         {
             if (emu)
@@ -23,15 +24,19 @@ namespace vgmuse {
         Music_Emu *emu;
 
         int current_track;
+        float volume;
     };
 
     void fillOutBuffer(void *data, short *out, int count)
     {
         auto m = static_cast<Player::Impl *>(data);
-        if (m->emu)
-            gme_play(m->emu, count, out);
 
-        std::copy(out, out + count, buf.begin());
+        if (m->emu) {
+            gme_play(m->emu, count, out);
+            for (int i = 0; i < count; ++i)
+                out[i] = (short)((float)out[i] * m->volume);
+            std::copy(out, out + count, buf.begin());
+        }
     }
 
     Player::Player(): m(new Impl)
@@ -121,7 +126,67 @@ namespace vgmuse {
 
     int Player::current_track() const
     {
-        return m->emu ? gme_start_track();
+        return m->emu ? m->current_track : -1;
+    }
+
+
+
+    int Player::total_time() const
+    {
+        if (!m->emu) return 0;
+
+        gme_info_t *info;
+        auto result = gme_track_info(m->emu, &info, m->current_track);
+
+        if (result) return 0;
+
+        int time = info->play_length;
+
+        gme_free_info(info);
+
+        return time;
+    }
+
+    float Player::volume() const
+    {
+        return m->volume;
+    }
+
+    void Player::volume(float v)
+    {
+        m->volume = v;
+    }
+
+    std::string Player::album_title() const
+    {
+        if (!m->emu) return "";
+
+        gme_info_t *info;
+        auto result = gme_track_info(m->emu, &info, m->current_track);
+
+        if (result) return "";
+
+        std::string title(info->game);
+
+        gme_free_info(info);
+
+        return title;
+    }
+
+    std::string Player::author() const
+    {
+        if (!m->emu) return "";
+
+        gme_info_t *info;
+        auto result = gme_track_info(m->emu, &info, m->current_track);
+
+        if (result) return "";
+
+        std::string author(info->author);
+
+        gme_free_info(info);
+
+        return author;
     }
 
 }
